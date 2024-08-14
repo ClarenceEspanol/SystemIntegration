@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="adminStyle.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <title>ADMIN | JBC SCHOOL SUPPLIES AND HOUSEWARE</title>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <a href="#">
+                <img src="images/logojbc.png" width="50px" alt="JBC Logo">
+            </a>
+            <h1 class="title">JBC SCHOOL SUPPLIES AND HOUSEWARE</h1>
+        </div>
+    
+        <div class="navbar-wrapper">
+            <div class="message">
+                <p id="greeting">Good morning, ADMIN</p>
+                <p id="datetime">9:12:30 am 8/14/2024</p>
+            </div>
+        </div>
+    
+        <div class="navbar">
+            <a href="index.html">dashboard</a>
+            <a href="#">orders</a>
+            <a href="#">add products</a>
+            <a href="#">update products</a>
+        </div>
+
+
+        <div class="icons">
+            </div>
+            <div class="fas fa-bars" id="menu-btn"></div>
+        </div>
+    </header>
+
+    <section class="dashboard" id="dashboard">
+        <h1 class="heading"><span>Dashboard: </span></h1>
+        <div class="dashboard-content">
+            <!-- Add your dashboard content here -->
+        </div>
+    </section>
+    
+    <section class="add-product-form" id="add-product-form">
+        <h1 class="heading"><span>Add Product</span></h1>
+        <form action="#" method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="product-name">Product Name:</label>
+                <input type="text" id="product-name" name="product-name" required>
+            </div>
+            <div class="form-group">
+                <label for="product-img">Product Image:</label>
+                <input type="file" id="product-img" name="product-img" accept="image/*" required>
+            </div>
+            <div class="form-group">
+                <label for="price">Price: ₱</label>
+                <input type="number" id="price" name="price" step="0.01" required>
+            </div>
+            <button type="submit" class="btn">Add Product</button>
+        </form>
+    </section>
+    
+    <section class="update-product-form" id="update-product-form">
+        <h1 class="heading"><span>Update Product</span></h1>
+        <form action="#" method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="update-product-id">Product ID:</label>
+                <input type="text" id="update-product-id" name="product-id" required>
+            </div>
+            <div class="form-group">
+                <label for="update-product-name">Product Name:</label>
+                <input type="text" id="update-product-name" name="product-name">
+            </div>
+            <div class="form-group">
+                <label for="update-product-img">Product Image:</label>
+                <input type="file" id="update-product-img" name="product-img" accept="image/*">
+            </div>
+            <div class="form-group">
+                <label for="update-price">Price: ₱</label>
+                <input type="number" id="update-price" name="price" step="0.01">
+            </div>
+            <button type="submit" class="btn save-changes">Save Changes</button>
+            <button type="button" class="btn cancel">Cancel</button>
+            <button type="button" class="btn delete">Delete Product</button>
+        </form>
+    </section>
+
+    <section class="orders" id="orders">
+        <h1 class="heading">Order <span>Management</span></h1>
+        <div id="orders-display"></div>
+    </section>
+
+    <section class="feedback" id="feedback">
+        <h1 class="heading">User <span>Feedback</span></h1>
+        <div id="feedback-display"></div>
+    </section>
+    
+    <section class="contact" id="contact">
+        <h1 class="heading"><span>Contact Us</span> Submissions</h1>
+        <div id="contact-display"></div>
+    </section>
+    
+    <section class="users" id="users">
+        <h1 class="heading">New <span>Users</span></h1>
+        <div id="users-display"></div>
+    </section>
+    
+    
+    
+       
+    
+
+
+
+
+    <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+
+    // Your Firebase configuration
+    const firebaseConfig = {
+        apiKey: "AIzaSyAmiSdmLGutt2kwljfpUtHRRkBKKFJKHbE",
+        authDomain: "fir-javascriptcrud-fa5c9.firebaseapp.com",
+        databaseURL: "https://fir-javascriptcrud-fa5c9-default-rtdb.firebaseio.com",
+        projectId: "fir-javascriptcrud-fa5c9",
+        storageBucket: "fir-javascriptcrud-fa5c9.appspot.com",
+        messagingSenderId: "283386349642",
+        appId: "1:283386349642:web:207ec2915f0d8464fdfeb3"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const auth = getAuth(app);
+
+    // Function to load feedback
+    function loadFeedback() {
+        const feedbackRef = ref(db, '/feedback/');
+        onValue(feedbackRef, (snapshot) => {
+            const feedbackDisplay = document.getElementById('feedback-display');
+            if (feedbackDisplay) {
+                feedbackDisplay.innerHTML = '';
+                if (snapshot.exists()) {
+                    const feedbackData = snapshot.val();
+                    const feedbackArray = Object.values(feedbackData);
+                    feedbackArray.sort((a, b) => b.createdAt - a.createdAt);
+                    feedbackArray.slice(0, 10).forEach(feedback => {
+                        const name = feedback.name || 'Anonymous';
+                        const message = feedback.message;
+                        const feedbackItem = document.createElement('div');
+                        feedbackItem.classList.add('feedback-item');
+                        feedbackItem.innerHTML = `
+                            <p><strong>${name}:</strong> ${message}</p>
+                        `;
+                        feedbackDisplay.appendChild(feedbackItem);
+                    });
+                } else {
+                    console.log("No feedback data available.");
+                }
+            }
+        }, (error) => {
+            console.error("Error loading feedback data:", error);
+        });
+    }
+
+    // Function to load contact submissions
+    function loadContacts() {
+        const contactRef = ref(db, '/contact/');
+        onValue(contactRef, (snapshot) => {
+            const contactDisplay = document.getElementById('contact-display');
+            if (contactDisplay) {
+                contactDisplay.innerHTML = '';
+                if (snapshot.exists()) {
+                    const contactData = snapshot.val();
+                    const contactArray = Object.values(contactData);
+                    contactArray.sort((a, b) => b.createdAt - a.createdAt);
+                    contactArray.slice(0, 10).forEach(contact => {
+                        const name = contact.name || 'Anonymous';
+                        const email = contact.email;
+                        const phone = contact.phone;
+                        const message = contact.message;
+                        const contactItem = document.createElement('div');
+                        contactItem.classList.add('contact-item');
+                        contactItem.innerHTML = `
+                            <p><strong>Name:</strong> ${name}</p>
+                            <p><strong>Email:</strong> ${email}</p>
+                            <p><strong>Phone:</strong> ${phone}</p>
+                            <p><strong>Message:</strong> ${message}</p>
+                        `;
+                        contactDisplay.appendChild(contactItem);
+                    });
+                } else {
+                    console.log("No contact data available.");
+                }
+            }
+        }, (error) => {
+            console.error("Error loading contact data:", error);
+        });
+    }
+
+    // Function to load new user registrations
+    function loadUsers() {
+        const usersRef = ref(db, '/users/');
+        onValue(usersRef, (snapshot) => {
+            const usersDisplay = document.getElementById('users-display');
+            if (usersDisplay) {
+                usersDisplay.innerHTML = '';
+                if (snapshot.exists()) {
+                    const usersData = snapshot.val();
+                    const usersArray = Object.values(usersData);
+                    usersArray.sort((a, b) => b.createdAt - a.createdAt);
+                    usersArray.slice(0, 10).forEach(user => {
+                        const username = user.username || 'Unknown';
+                        const createdAt = new Date(user.createdAt).toLocaleString();
+                        const userItem = document.createElement('div');
+                        userItem.classList.add('user-item');
+                        userItem.innerHTML = `
+                            <p><strong>Username:</strong> ${username}</p>
+                            <p><strong>Registered At:</strong> ${createdAt}</p>
+                        `;
+                        usersDisplay.appendChild(userItem);
+                    });
+                } else {
+                    console.log("No user data available.");
+                }
+            }
+        }, (error) => {
+            console.error("Error loading user data:", error);
+        });
+    }
+
+    // Call functions on page load
+    document.addEventListener('DOMContentLoaded', () => {
+        loadFeedback();
+        loadContacts();
+        loadUsers();
+    });
+    </script>
+
+    
+    <script  src="adminscript.js"></script>
+</body>
+</html>
