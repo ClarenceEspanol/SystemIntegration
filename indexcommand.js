@@ -235,7 +235,7 @@ function submitFeedbackForm(formData) {
     const feedbackName = formData.get("feedback-name");
     const feedbackMessage = formData.get("feedback-message");
 
-    if (feedbackMessage.trim() === "") {
+    if (!feedbackMessage || feedbackMessage.trim() === "") {
         alert("Feedback message cannot be empty.");
         return;
     }
@@ -247,6 +247,7 @@ function submitFeedbackForm(formData) {
     })
     .then(() => {
         feedbackForm.reset();
+        alert("Feedback submitted successfully!");
         loadFeedback(); // Reload feedback after submission
     })
     .catch((error) => {
@@ -266,6 +267,7 @@ function renderFeedback(name, message) {
     `;
     feedbackDisplay.appendChild(feedbackItem);
 }
+document.addEventListener('DOMContentLoaded', loadFeedback);
 
 // Function to load existing feedback from Firebase and display it
 function loadFeedback() {
@@ -321,20 +323,54 @@ openModalTriggers.forEach(trigger => {
     });
 });
 
-// Cart Button Event Listener
-const cartBtn = document.getElementById('cart-btn');
-const cartItemsContainer = document.querySelector('.header .cart-items-container');
 
-cartBtn.addEventListener('click', function () {
+
+// Select necessary elements
+let navbar = document.querySelector('.navbar');
+let menuBtn = document.querySelector('#menu-btn');
+let cartBtn = document.getElementById('cart-btn');
+let cartItemsContainer = document.querySelector('.header .cart-items-container');
+let navLinks = document.querySelectorAll('.navbar a');
+
+// Toggle menu visibility
+menuBtn.onclick = () => {
+    if (cartItemsContainer.classList.contains('active')) {
+        cartItemsContainer.classList.remove('active');
+    }
+    navbar.classList.toggle('active');
+};
+
+// Toggle cart items visibility
+cartBtn.onclick = () => {
     if (!auth.currentUser) {
         showModal();
     } else {
+        if (navbar.classList.contains('active')) {
+            navbar.classList.remove('active');
+        }
         cartItemsContainer.classList.toggle('active');
         console.log('Cart button clicked, active class toggled.'); // Debugging
     }
+};
+
+// Close menu and cart when scrolling
+window.onscroll = () => {
+    navbar.classList.remove('active');
+    cartItemsContainer.classList.remove('active');
+};
+
+// Close menu when clicking on a nav link
+navLinks.forEach(link => {
+    link.onclick = () => {
+        navbar.classList.remove('active');
+    };
 });
+
 // Open the login modal when clicking on the "Log In" link
 document.querySelector('.navbar a[href="#login-modal"]').addEventListener('click', function(e) {
     e.preventDefault();
     showModal();
 });
+
+
+

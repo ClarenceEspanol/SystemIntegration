@@ -117,129 +117,134 @@
 
 
     <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
-
-    // Your Firebase configuration
-    const firebaseConfig = {
-        apiKey: "AIzaSyAmiSdmLGutt2kwljfpUtHRRkBKKFJKHbE",
-        authDomain: "fir-javascriptcrud-fa5c9.firebaseapp.com",
-        databaseURL: "https://fir-javascriptcrud-fa5c9-default-rtdb.firebaseio.com",
-        projectId: "fir-javascriptcrud-fa5c9",
-        storageBucket: "fir-javascriptcrud-fa5c9.appspot.com",
-        messagingSenderId: "283386349642",
-        appId: "1:283386349642:web:207ec2915f0d8464fdfeb3"
-    };
-
-    // Initialize Firebase
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-    const auth = getAuth(app);
-
-    // Function to load feedback
-    function loadFeedback() {
-        const feedbackRef = ref(db, '/feedback/');
-        onValue(feedbackRef, (snapshot) => {
-            const feedbackDisplay = document.getElementById('feedback-display');
-            if (feedbackDisplay) {
-                feedbackDisplay.innerHTML = '';
-                if (snapshot.exists()) {
-                    const feedbackData = snapshot.val();
-                    const feedbackArray = Object.values(feedbackData);
-                    feedbackArray.sort((a, b) => b.createdAt - a.createdAt);
-                    feedbackArray.slice(0, 10).forEach(feedback => {
-                        const name = feedback.name || 'Anonymous';
-                        const message = feedback.message;
-                        const feedbackItem = document.createElement('div');
-                        feedbackItem.classList.add('feedback-item');
-                        feedbackItem.innerHTML = `
-                            <p><strong>${name}:</strong> ${message}</p>
-                        `;
-                        feedbackDisplay.appendChild(feedbackItem);
-                    });
-                } else {
-                    console.log("No feedback data available.");
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+    
+        // Your Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAmiSdmLGutt2kwljfpUtHRRkBKKFJKHbE",
+            authDomain: "fir-javascriptcrud-fa5c9.firebaseapp.com",
+            databaseURL: "https://fir-javascriptcrud-fa5c9-default-rtdb.firebaseio.com",
+            projectId: "fir-javascriptcrud-fa5c9",
+            storageBucket: "fir-javascriptcrud-fa5c9.appspot.com",
+            messagingSenderId: "283386349642",
+            appId: "1:283386349642:web:207ec2915f0d8464fdfeb3"
+        };
+    
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const auth = getAuth(app);
+    
+        // Function to load feedback
+        function loadFeedback() {
+            const feedbackRef = ref(db, '/feedback/');
+            onValue(feedbackRef, (snapshot) => {
+                const feedbackDisplay = document.getElementById('feedback-display');
+                if (feedbackDisplay) {
+                    feedbackDisplay.innerHTML = '';
+                    if (snapshot.exists()) {
+                        const feedbackData = snapshot.val();
+                        const feedbackArray = Object.values(feedbackData);
+                        feedbackArray.sort((a, b) => b.createdAt - a.createdAt);
+                        feedbackArray.slice(0, 10).forEach(feedback => {
+                            const name = feedback.name || 'Anonymous';
+                            const message = feedback.message;
+                            const createdAt = new Date(feedback.createdAt).toLocaleString();
+                            const feedbackItem = document.createElement('div');
+                            feedbackItem.classList.add('feedback-item');
+                            feedbackItem.innerHTML = `
+                                <p><strong>${name}:</strong> ${message}</p>
+                                <p><em>Sent on: ${createdAt}</em></p>
+                            `;
+                            feedbackDisplay.appendChild(feedbackItem);
+                        });
+                    } else {
+                        console.log("No feedback data available.");
+                    }
                 }
-            }
-        }, (error) => {
-            console.error("Error loading feedback data:", error);
-        });
-    }
-
-    // Function to load contact submissions
-    function loadContacts() {
-        const contactRef = ref(db, '/contact/');
-        onValue(contactRef, (snapshot) => {
-            const contactDisplay = document.getElementById('contact-display');
-            if (contactDisplay) {
-                contactDisplay.innerHTML = '';
-                if (snapshot.exists()) {
-                    const contactData = snapshot.val();
-                    const contactArray = Object.values(contactData);
-                    contactArray.sort((a, b) => b.createdAt - a.createdAt);
-                    contactArray.slice(0, 10).forEach(contact => {
-                        const name = contact.name || 'Anonymous';
-                        const email = contact.email;
-                        const phone = contact.phone;
-                        const message = contact.message;
-                        const contactItem = document.createElement('div');
-                        contactItem.classList.add('contact-item');
-                        contactItem.innerHTML = `
-                            <p><strong>Name:</strong> ${name}</p>
-                            <p><strong>Email:</strong> ${email}</p>
-                            <p><strong>Phone:</strong> ${phone}</p>
-                            <p><strong>Message:</strong> ${message}</p>
-                        `;
-                        contactDisplay.appendChild(contactItem);
-                    });
-                } else {
-                    console.log("No contact data available.");
+            }, (error) => {
+                console.error("Error loading feedback data:", error);
+            });
+        }
+    
+        // Function to load contact submissions
+        function loadContacts() {
+            const contactRef = ref(db, '/contact/');
+            onValue(contactRef, (snapshot) => {
+                const contactDisplay = document.getElementById('contact-display');
+                if (contactDisplay) {
+                    contactDisplay.innerHTML = '';
+                    if (snapshot.exists()) {
+                        const contactData = snapshot.val();
+                        const contactArray = Object.values(contactData);
+                        contactArray.sort((a, b) => b.createdAt - a.createdAt);
+                        contactArray.slice(0, 10).forEach(contact => {
+                            const name = contact.name || 'Anonymous';
+                            const email = contact.email;
+                            const phone = contact.phone;
+                            const message = contact.message;
+                            const createdAt = new Date(contact.createdAt).toLocaleString();
+                            const contactItem = document.createElement('div');
+                            contactItem.classList.add('contact-item');
+                            contactItem.innerHTML = `
+                                <p><strong>Name:</strong> ${name}</p>
+                                <p><strong>Email:</strong> ${email}</p>
+                                <p><strong>Phone:</strong> ${phone}</p>
+                                <p><strong>Message:</strong> ${message}</p>
+                                <p><em>Sent on: ${createdAt}</em></p>
+                            `;
+                            contactDisplay.appendChild(contactItem);
+                        });
+                    } else {
+                        console.log("No contact data available.");
+                    }
                 }
-            }
-        }, (error) => {
-            console.error("Error loading contact data:", error);
-        });
-    }
-
-    // Function to load new user registrations
-    function loadUsers() {
-        const usersRef = ref(db, '/users/');
-        onValue(usersRef, (snapshot) => {
-            const usersDisplay = document.getElementById('users-display');
-            if (usersDisplay) {
-                usersDisplay.innerHTML = '';
-                if (snapshot.exists()) {
-                    const usersData = snapshot.val();
-                    const usersArray = Object.values(usersData);
-                    usersArray.sort((a, b) => b.createdAt - a.createdAt);
-                    usersArray.slice(0, 10).forEach(user => {
-                        const username = user.username || 'Unknown';
-                        const createdAt = new Date(user.createdAt).toLocaleString();
-                        const userItem = document.createElement('div');
-                        userItem.classList.add('user-item');
-                        userItem.innerHTML = `
-                            <p><strong>Username:</strong> ${username}</p>
-                            <p><strong>Registered At:</strong> ${createdAt}</p>
-                        `;
-                        usersDisplay.appendChild(userItem);
-                    });
-                } else {
-                    console.log("No user data available.");
+            }, (error) => {
+                console.error("Error loading contact data:", error);
+            });
+        }
+    
+        // Function to load new user registrations
+        function loadUsers() {
+            const usersRef = ref(db, '/users/');
+            onValue(usersRef, (snapshot) => {
+                const usersDisplay = document.getElementById('users-display');
+                if (usersDisplay) {
+                    usersDisplay.innerHTML = '';
+                    if (snapshot.exists()) {
+                        const usersData = snapshot.val();
+                        const usersArray = Object.values(usersData);
+                        usersArray.sort((a, b) => b.createdAt - a.createdAt);
+                        usersArray.slice(0, 10).forEach(user => {
+                            const username = user.username || 'Unknown';
+                            const createdAt = new Date(user.createdAt).toLocaleString();
+                            const userItem = document.createElement('div');
+                            userItem.classList.add('user-item');
+                            userItem.innerHTML = `
+                                <p><strong>Username:</strong> ${username}</p>
+                                <p><strong>Registered At:</strong> ${createdAt}</p>
+                            `;
+                            usersDisplay.appendChild(userItem);
+                        });
+                    } else {
+                        console.log("No user data available.");
+                    }
                 }
-            }
-        }, (error) => {
-            console.error("Error loading user data:", error);
+            }, (error) => {
+                console.error("Error loading user data:", error);
+            });
+        }
+    
+        // Call functions on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadFeedback();
+            loadContacts();
+            loadUsers();
         });
-    }
-
-    // Call functions on page load
-    document.addEventListener('DOMContentLoaded', () => {
-        loadFeedback();
-        loadContacts();
-        loadUsers();
-    });
     </script>
+    
 
     
     <script  src="adminscript.js"></script>
