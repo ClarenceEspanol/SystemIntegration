@@ -211,7 +211,7 @@ header {
     color: #ccc;
 }
 
-/* Form Styles */
+/* General Form Styles */
 .add-product-form, .update-product-form {
     margin: 20px;
 }
@@ -225,6 +225,105 @@ header {
     margin: 0 auto;
 }
 
+/* Product List Container */
+.update-product-form .product-list-container {
+    background-color: var(--bg);
+    border: var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    position: relative; /* Added for positioning the subheading */
+}
+
+/* Subheading */
+.update-product-form .product-list-container .subheading {
+    background-color: var(--main-color); /* Background color to distinguish */
+    color: #fff;
+    padding: 10px;
+    border-radius: 8px 8px 0 0; /* Rounded corners at the top */
+    font-size: 1.8rem;
+    font-weight: bold;
+    text-align: center;
+    margin: 0;
+}
+
+/* Product List */
+.update-product-form .product-list {
+    display: flex;
+    flex-direction: column; /* Align categories in a column */
+    gap: 20px; /* Space between categories */
+}
+
+/* Product Category */
+.product-category {
+    display: flex;
+    flex-direction: column; /* Align items in a column */
+    gap: 10px; /* Space between category title and items */
+}
+
+.product-category h3 {
+    font-size: 1.6rem;
+    color: #fff;
+    margin-bottom: 10px;
+}
+
+/* Product List Items */
+.product-list-items {
+    display: flex;
+    flex-wrap: wrap; /* Allow wrapping */
+    gap: 20px; /* Space between items */
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.product-list-items li {
+    background-color: var(--bg);
+    border: var(--border);
+    border-radius: 8px;
+    color: #fff;
+    padding: 10px; /* Adjusted padding to fit text */
+    flex: 1 1 calc(20% - 20px); /* Five items per row with gap */
+    box-sizing: border-box;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center; /* Center text inside the item */
+}
+
+.product-list-items li:hover {
+    background-color: var(--main-color);
+    color: #fff;
+}
+
+.product-item {
+    display: flex;
+    align-items: center;
+    font-size: 2rem;
+    gap: 15px;
+    flex-direction: column; /* Stack image and text vertically */
+}
+
+.product-item img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.product-item .product-details {
+    text-align: center; /* Center text inside the details */
+}
+
+.product-item .product-name {
+    font-weight: bold;
+    font-size: 1.4rem; /* Adjusted font size */
+    margin: 0; /* Removed margin to fit text */
+}
+
+/* Form Group Styles */
 .add-product-form .form-group, .update-product-form .form-group {
     margin-bottom: 1.5rem;
 }
@@ -236,7 +335,14 @@ header {
     margin-bottom: 0.5rem;
 }
 
-.add-product-form input[type="text"], .add-product-form input[type="file"], .add-product-form input[type="number"], .update-product-form input[type="text"], .update-product-form input[type="file"], .update-product-form input[type="number"] {
+.add-product-form input[type="text"], 
+.add-product-form input[type="file"], 
+.add-product-form input[type="number"], 
+.add-product-form select, 
+.update-product-form input[type="text"], 
+.update-product-form input[type="file"], 
+.update-product-form input[type="number"],
+.update-product-form select {
     width: 100%;
     padding: 0.8rem;
     border: var(--border);
@@ -245,6 +351,7 @@ header {
     background-color: #fff;
 }
 
+/* Button Styles */
 .add-product-form button, .update-product-form button {
     display: inline-block;
     margin: 1rem 0.5rem;
@@ -277,6 +384,9 @@ header {
 .update-product-form .delete:hover {
     background-color: #ec971f;
 }
+
+
+
 
 
 
