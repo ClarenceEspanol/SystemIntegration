@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JBC School Supplies and Houseware</title>
+    <link rel="stylesheet" href="/css/indexStyle.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+    
+</head>
+<body>
+    <div class="background-blur">
+        <!-- Your page content here -->
+    
+    <header class="header">
+        <a href="#">
+            <img src="images/logojbc.png" width="50px">
+        </a>
+        <h1 class="title">JBC SCHOOL SUPPLIES AND HOUSEWARE</h1>
+        
+        <div class="navbar">
+            <a href="#home">Home</a>
+            <a href="#school">School Supplies</a>
+            <a href="#houseware">Houseware</a>
+            <a href="#contact">Contact us</a>
+            <a href="#about">About us</a>
+            <a href="#feedback">Feedback</a>
+            <!-- This link will be dynamically replaced -->
+            <a href="#login-modal" id="auth-link">Log In</a>
+    
+            <div class="user-menu" style="display: none;">
+                <a href="#"  id="view-profile-btn">View Profile</a>
+                <a href="#" id="logout-btn">Log Out</a>
+            </div>
+        </div>
+        <div class="icons">
+            <div class="fas fa-shopping-cart" id="cart-btn">
+                <span id="cart-count" class="cart-count">0</span>
+            </div>
+            <div class="fas fa-bars" id="menu-btn"></div>
+        </div>
+        
+        <div class="cart-items-container">
+            <!-- Total Price Display -->
+            <div class="cart-total">
+                <div class="price">₱0.00</div>
+            </div>
+            
+            <!-- Cart items will be dynamically added here -->
+            <div id="cart-items"></div>
+            <a href="#" class="btn">Checkout Now</a>
+        </div>
+    </header>
+
+   <section class="home" id="home">
+
+        <div class="content">
+            <h3>Elevate Your Everyday with JBC School and Houseware</h3>
+            <p>At JBC School and Houseware, we blend quality and comfort to create products that elevate your home and school environments. Discover our wide range of items designed to meet every need, from school supplies to household essentials. Together, let’s make every day more convenient and productive.</p>
+            <a href="#school" class="btn">Get yours now</a>
+            
+        </div>
+   </section>
+
+ <!-- school supplies-->
+<section class="school" id="school">
+    <h1 class="heading">school <span>supplies</span></h1>
+    <div class="box-container">
+        <!-- Product boxes will be inserted here dynamically by JavaScript -->
+    </div>
+    <div class="show">
+        <a href="products.html" class="btn">show more...</a>
+    </div>
+</section>
+
+
+   <!-- houseware -->
+<section class="houseware" id="houseware">
+    <h1 class="heading"><span>house</span> ware</h1>
+    <div class="box-container">
+        <!-- Product boxes will be inserted here dynamically by JavaScript -->
+    </div>
+    <div class="show">
+        <a href="products.html" class="btn">show more...</a>
+    </div>
+</section>
+
+
+   <!-- contact-->
+   <section class="contact" id="contact">
+    <h1 class="heading"><span>contact</span> us</h1>
+
+    <div class="row">
+        <iframe class="map" src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d7736.855162361384!2d122.6254589!3d14.1697166!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x33989b954e4e686f%3A0x8e209b2bf354ee0d!2sJBC%20School%20Supply!5e0!3m2!1sen!2sph!4v1723128117144!5m2!1sen!2sph" allowfullscreen="" loading="lazy"></iframe>
+        
+        <div class="contact-info">
+            <h3>Contact Information</h3>
+            <div class="info-item">
+                <span class="fas fa-map-marker-alt"></span>
+                <p>PUROK-3 BAGONG SILANG 1, LABO, PHILIPPINES</p>
+            </div>
+            <div class="info-item">
+                <span class="fas fa-phone"></span>
+                <p>0954-188-5454</p>
+            </div>
+            <div class="info-item">
+                <span class="fas fa-envelope"></span>
+                <p class="con-email">jbcschoolsupplies@gmail.com</p>
+            </div>
+            <div class="info-item">
+                <span class="fas fa-clock"></span>
+                <p>Mon-Sun: 9:00 AM - 5:00 PM</p>
+            </div>
+        </div>
+
+        <form id="contact-form">
+            <h3>Get in Touch</h3>
+            <input type="hidden" name="hidden-id" value="">
+            <div class="inputBox">
+                <span class="fas fa-user"></span>
+                <input type="text" id="name" name="name" placeholder="Name" required>
+            </div>
+            <div class="inputBox">
+                <span class="fas fa-envelope"></span>
+                <input type="email" id="email" name="email" placeholder="Email" required>
+            </div>
+            <div class="inputBox">
+                <span class="fas fa-phone"></span>
+                <input type="tel" id="phone" name="phone" placeholder="Phone Number" required>
+            </div>
+            <div class="inputBox">
+                <span class="fas fa-comment"></span>
+                <textarea id="message" name="message" placeholder="Your Message" required></textarea>
+            </div>
+            <input type="submit" value="Contact Now" class="btn">
+        </form>
+    </div>
+</section>
+
+
+
+        <!-- ABOUT-->
+   <section class="about" id="about">
+    <h1 class="heading"><span>about</span> us</h1>
+    <div class="row">
+        
+        <div class="image">
+            <img src="images/about-img.png" alt="">
+        </div>
+        <div class="content">
+            <h3>Get to Know JBC School Supplies and Houseware</h3>
+            <p>Welcome to JBC School Supplies and Houseware, your go-to for affordable, high-quality products for both education and home. With over [X] years of experience, we offer a broad range of school supplies, including notebooks, pens, and art materials, as well as houseware essentials like kitchen tools and home organization solutions. Our mission is to enhance learning and improve everyday living.</p>
+            <h3>Our Commitment</h3>
+            <p>At JBC, we prioritize customer satisfaction and community involvement. Our friendly staff is dedicated to helping you find what you need in a welcoming environment, offering quality products that suit your lifestyle and budget. We are actively engaged in the community, partnering with local schools and organizations to support educational and community events. Visit us to explore our extensive range of products for school and home. Thank you for choosing JBC as your trusted source for school and household essentials.</p>
+            <a href="#" class="btn">learn more</a>
+        </div>
+    </div>
+   </section>
+
+        <!-- feedback-->
+    <section class="feedback" id="feedback">
+                <h1 class="heading">feedback <span>form</span> </h1>
+            
+                <div class="row">
+                    <div class="image">
+                        <img src="images/feedbg.png" alt="">
+                    </div>
+                    <form id="feedback-form">
+                        <h3>Share Your Thoughts With Us</h3>
+                        <div class="inputBox">
+                            <span class="fas fa-user"></span>
+                            <input type="text" id="feedback-name" name="feedback-name" placeholder="Name">
+                        </div>
+                        <div class="inputBox">
+                            <span class="fas fa-envelope"></span>
+                            <input type="email" id="feedback-email" name="feedback-email" placeholder="Email">
+                        </div>
+                        <div class="inputBox">
+                            <span class="fas fa-phone"></span>
+                            <input type="tel" id="feedback-phone" name="feedback-phone" placeholder="Phone Number">
+                        </div>
+                        <div class="inputBox">
+                            <span class="fas fa-comment"></span>
+                            <textarea id="feedback-message" name="feedback-message" placeholder="Message" rows="4"></textarea>
+                        </div>
+                        <input type="submit" value="Submit Feedback" class="btn">
+                    </form>
+                </div>
+                <h1 class="heading">  <span>User</span> Feedback  </h1>
+                <div id="feedback-display">
+                </div>
+    </section>
+
+
+         <!-- footer-->
+   <section class="footer">
+    <div class="share">
+        <a href="https://www.facebook.com/jbcschoolsupplies" target="_blank" class="fab fa-facebook"></a>   
+    </div>
+    <div class="links">
+        <a href="#home">Home</a>
+        <a href="products.html">products</a>
+        <a href="#contact">Contact us</a>
+        <a href="#about">About us</a>
+        <a href="#feedback">Feedback</a>
+    </div>
+    <div class="credit">© <span>mr. Clarence Espanol</span> | all rights reserved</div>
+   </section>
+</div>
+
+   <!-- login/register -->
+   <div id="login-modal" class="modal">
+    <div class="modal-content">
+         <!-- Close icon -->
+         <span class="close-modal">&times;</span>
+ 
+        <!-- Login Form -->
+        <div id="login-form" class="form active">
+            <h2>Login</h2>
+            <form>
+                <label for="username">email:</label>
+                <input type="text" id="username" name="username" required>
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+                <button type="submit" class="btn">Login</button>
+                <p><a href="#" id="show-register">Don't have an account? Register</a></p>
+            </form>
+        </div>
+
+        <!-- Register Form -->
+        <div id="register-form" class="form">
+            <h2>Register</h2>
+            <form>
+                <label for="register-username">email:</label>
+                <input type="text" id="register-username" name="username" required>
+                <label for="register-password">Password:</label>
+                <input type="password" id="register-password" name="password" required>
+                <label for="repeat-password">Repeat Password:</label>
+                <input type="password" id="repeat-password" name="repeat-password" required>
+                <button type="submit" class="btn">Register</button>
+                <p><a href="#" id="show-login">Already have an account? Login</a></p>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Profile Modal -->
+<div class="modal profile-modal" id="profile-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Profile Information</h2>
+            <button id="close-profile-modal" class="close-modal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <!-- Existing Profile Information Display -->
+            <section class="profile-data">
+                <h3>Current Profile Information</h3>
+                <div id="current-profile-data">
+                    <!-- Profile data will be inserted here -->
+                </div>
+            </section>
+
+            <!-- Profile Information Form -->
+            <section class="profile-info">
+                <div class="icon"><i class="fas fa-user"></i></div>
+                <h3>Edit Profile Information</h3>
+                <form id="profile-form">
+                    <label for="profile-name">Name:</label>
+                    <input type="text" id="profile-name" placeholder="John Doe" />
+                    
+                    <label for="profile-bday">Birthday:</label>
+                    <input type="date" id="profile-bday" />
+                    
+                    <label for="profile-email">Email:</label>
+                    <input type="email" id="profile-email" placeholder="john.doe@example.com" />
+                    
+                    <button type="button" id="update-profile-btn">Update Profile</button>
+                </form>
+            </section>
+
+            <!-- Existing Address Data Display -->
+            <section class="address-data">
+                <h3>Current Address Information</h3>
+                <div id="current-address-data">
+                    <!-- Address data will be inserted here -->
+                </div>
+            </section>
+
+            <!-- Addresses Form -->
+            <section class="addresses">
+                <div class="icon"><i class="fas fa-map-marker-alt"></i></div>
+                <h3>Edit Address Information</h3>
+                <form id="address-form">
+                    <label for="contact-name">Contact Name:</label>
+                    <input type="text" id="contact-name" placeholder="John Doe" />
+                    
+                    <label for="contact-phone">Phone Number:</label>
+                    <input type="tel" id="contact-phone" placeholder="+63934567890" />
+                    
+                    <label for="address">Address:</label>
+                    <textarea id="address" placeholder="1234 Elm Street, Springfield"></textarea>
+                    
+                    <label for="house-number">House Number:</label>
+                    <input type="text" id="house-number" placeholder="N/A" />
+                    
+                    <label for="city">City:</label>
+                    <input type="text" id="city" placeholder="Springfield" />
+                    
+                    <label for="state">State/Province:</label>
+                    <input type="text" id="state" placeholder="IL" />
+                    
+                    <label for="region">Region:</label>
+                    <input type="text" id="region" placeholder="Midwest" />
+                    
+                    <label for="zip">Zip/Postal Code:</label>
+                    <input type="text" id="zip" placeholder="62704" />
+                    
+                    <button type="button" id="update-address-btn">Update Address</button>
+                </form>
+            </section>
+
+            <!-- Change Password -->
+            <section class="change-password">
+                <div class="icon"><i class="fas fa-lock"></i></div>
+                <h3>Change Password</h3>
+                <form id="password-form">
+                    <label for="old-password">Old Password:</label>
+                    <input type="password" id="old-password" placeholder="Old Password" />
+                    
+                    <label for="new-password">New Password:</label>
+                    <input type="password" id="new-password" placeholder="New Password" />
+                    
+                    <label for="confirm-new-password">Confirm New Password:</label>
+                    <input type="password" id="confirm-new-password" placeholder="Confirm New Password" />
+                    
+                    <button type="button" id="save-password-btn">Save</button>
+                </form>
+            </section>
+        </div>
+    </div>
+</div>
+
+
+<script type="module" src="js/indexcommand.js"></script>
+    
+
+
+
+</body>
+</html>

@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/adminStyle.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <title>ADMIN | JBC SCHOOL SUPPLIES AND HOUSEWARE</title>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <a href="#">
+                <img src="images/logojbc.png" width="50px" alt="JBC Logo">
+            </a>
+            <h1 class="title">JBC SCHOOL SUPPLIES AND HOUSEWARE</h1>
+        </div>
+    
+        <div class="navbar-wrapper">
+            <div class="message">
+                <p id="greeting">Good morning, ADMIN</p>
+                <p id="datetime">9:12:30 am 8/14/2024</p>
+            </div>
+        </div>
+    
+        <div class="navbar">
+            <a href="#dashboard">dashboard</a>
+            <a href="#orders">orders</a>
+            <a href="#add-product-form">add products</a>
+            <a href="#update-product-form">update products</a>
+        </div>
+
+
+        <div class="icons">
+            </div>
+            <div class="fas fa-bars" id="menu-btn"></div>
+        </div>
+    </header>
+
+    <section class="dashboard" id="dashboard">
+        <h1 class="heading"><span>Dashboard: </span></h1>
+        <div class="dashboard-content">
+            <!-- Add your dashboard content here -->
+        </div>
+    </section>
+
+    <!-- ADD ORDERS -->
+    
+    <section class="add-product-form" id="add-product-form">
+        <h1 class="heading"><span>Add Product</span></h1>
+        <form action="#" method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="product-name">Product Name:</label>
+                <input type="text" id="product-name" name="product-name" required>
+            </div>
+            <div class="form-group">
+                <label for="product-type">Product Type:</label>
+                <select id="product-type" name="product-type" required>
+                    <option value="school-supplies">School Supplies</option>
+                    <option value="houseware">Houseware</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="product-img">Product Image:</label>
+                <input type="file" id="product-img" name="product-img" accept="image/*" required>
+            </div>
+            <div class="form-group">
+                <label for="price">Price: ₱</label>
+                <input type="number" id="price" name="price" step="0.01" required>
+            </div>
+            <div class="form-group">
+                <label for="quantity">Quantity:</label>
+                <input type="number" id="quantity" name="quantity" required>
+            </div>
+            <button type="submit" class="btn">Add Product</button>
+        </form>
+    </section>
+
+
+   <!-- UPDATE PRODUCT -->
+<section class="update-product-form" id="update-product-form">
+    <h1 class="heading"><span>Update Product</span></h1>
+    <div class="product-list-container">
+        <h2 class="subheading"><span>Product List</span></h2>
+        <div class="product-list">
+            <div class="product-category" id="school-supplies">
+                <h3>School Supplies:</h3>
+                <ul class="product-list-items" id="school-supplies-list">
+                    <!-- School Supplies Products will be dynamically inserted here -->
+                </ul>
+            </div>
+            <div class="product-category" id="houseware">
+                <h3>Houseware:</h3>
+                <ul class="product-list-items" id="houseware-list">
+                    <!-- Houseware Products will be dynamically inserted here -->
+                </ul>
+            </div>
+        </div>
+    </div>
+    <form id="update-product-form" action="#" method="post" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="update-product-id">Product ID:</label>
+            <input type="text" id="update-product-id" name="product-id" required readonly>
+        </div>
+        <div class="form-group">
+            <label for="update-product-type">Product Type:</label>
+            <select id="update-product-type" name="product-type" required>
+                <option value="school-supplies">School Supplies</option>
+                <option value="houseware">Houseware</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="update-product-name">Product Name:</label>
+            <input type="text" id="update-product-name" name="product-name" required>
+        </div>
+        <div class="form-group">
+            <label for="update-product-img">Product Image:</label>
+            <input type="file" id="update-product-img" name="product-img" accept="image/*">
+        </div>
+        <div class="form-group">
+            <label for="update-price">Price: ₱</label>
+            <input type="number" id="update-price" name="price" step="0.01" required>
+        </div>
+        <div class="form-group">
+            <label for="update-quantity">Quantity:</label>
+            <input type="number" id="update-quantity" name="quantity" required>
+        </div>
+        <button type="submit" class="btn save-changes">Save Changes</button>
+        <button type="button" class="btn cancel">Cancel</button>
+        <button type="button" class="btn delete">Delete Product</button>
+    </form>
+</section>
+    
+<!-- ORDERS -->
+    <section class="orders" id="orders">
+        <h1 class="heading">Order <span>Management</span></h1>
+        <div id="orders-display"></div>
+    </section>
+<!-- FEEDBACK -->
+    <section class="feedback" id="feedback">
+        <h1 class="heading">User <span>Feedback</span></h1>
+        <div id="feedback-display"></div>
+    </section>
+    <!-- CONTACT -->
+    <section class="contact" id="contact">
+        <h1 class="heading"><span>Contact Us</span> Submissions</h1>
+        <div id="contact-display"></div>
+    </section>
+    <!-- USERS -->
+    <section class="users" id="users">
+        <h1 class="heading">New <span>Users</span></h1>
+        <div id="users-display"></div>
+    </section>
+    
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+        import { getDatabase, ref, set, get, onValue, remove } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
+        import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+        import { getStorage, ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-storage.js";
+    
+        // Your Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAmiSdmLGutt2kwljfpUtHRRkBKKFJKHbE",
+            authDomain: "fir-javascriptcrud-fa5c9.firebaseapp.com",
+            databaseURL: "https://fir-javascriptcrud-fa5c9-default-rtdb.firebaseio.com",
+            projectId: "fir-javascriptcrud-fa5c9",
+            storageBucket: "fir-javascriptcrud-fa5c9.appspot.com",
+            messagingSenderId: "283386349642",
+            appId: "1:283386349642:web:207ec2915f0d8464fdfeb3"
+        };
+    
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const auth = getAuth(app);
+        const storage = getStorage(app);
+    
+        // Function to handle form submission for adding a product
+        document.getElementById('add-product-form')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+    
+            const productName = document.getElementById('product-name').value;
+            const productType = document.getElementById('product-type').value;
+            const price = document.getElementById('price').value;
+            const quantity = document.getElementById('quantity').value;
+            const productImg = document.getElementById('product-img').files[0];
+    
+            // Reference to the selected product type node and ID counter
+            const productRef = ref(db, `/${productType}`);
+            const productIdCounterRef = ref(db, `/${productType}_counter`);
+    
+            try {
+                // Get the current product ID
+                const snapshot = await get(productIdCounterRef);
+                let productId = 1; // Start from 1 if no products exist
+                if (snapshot.exists()) {
+                    productId = snapshot.val() + 1;
+                }
+    
+                let productImgUrl = null;
+                if (productImg) {
+                    // Rename the image file based on the product ID
+                    const newFileName = `${productId}_${productImg.name}`;
+                    // Upload image to Firebase Storage
+                    const imgRef = storageRef(storage, `images/${productType}/${newFileName}`);
+                    await uploadBytes(imgRef, productImg);
+                    productImgUrl = await getDownloadURL(imgRef);
+                }
+    
+                // Prepare the new product data
+                const newProduct = {
+                    id: productId,
+                    name: productName,
+                    price: parseFloat(price),
+                    quantity: parseInt(quantity),
+                    createdAt: new Date().toISOString(),
+                    productImg: productImgUrl // Store the image URL here
+                };
+    
+                // Save the new product to the database
+                await set(ref(db, `/${productType}/${productId}`), newProduct);
+    
+                // Update the product ID counter
+                await set(productIdCounterRef, productId);
+    
+                // Clear the form after submission
+                e.target.reset();
+    
+                alert('Product added successfully!');
+            } catch (error) {
+                console.error("Error adding product:", error);
+            }
+        });
+    
+        // Function to load products for updating
+        function loadProducts() {
+            const schoolSuppliesRef = ref(db, '/school-supplies');
+            const housewareRef = ref(db, '/houseware');
+    
+            onValue(schoolSuppliesRef, (snapshot) => {
+                const schoolSuppliesList = document.getElementById('school-supplies-list');
+                if (schoolSuppliesList) {
+                    schoolSuppliesList.innerHTML = '';
+                    if (snapshot.exists()) {
+                        const products = snapshot.val();
+                        Object.values(products).forEach(product => {
+                            const productItem = document.createElement('li');
+                            productItem.textContent = `${product.name} (ID: ${product.id})`;
+                            productItem.dataset.productId = product.id;
+                            productItem.dataset.productType = 'school-supplies';
+                            productItem.classList.add('product-item');
+                            if (product.productImg) {
+                                const img = document.createElement('img');
+                                img.src = product.productImg;
+                                img.alt = `${product.name} Image`;
+                                img.style.width = '100px'; // Adjust as needed
+                                productItem.appendChild(img);
+                            }
+                            schoolSuppliesList.appendChild(productItem);
+                        });
+                    }
+                }
+            });
+    
+            onValue(housewareRef, (snapshot) => {
+                const housewareList = document.getElementById('houseware-list');
+                if (housewareList) {
+                    housewareList.innerHTML = '';
+                    if (snapshot.exists()) {
+                        const products = snapshot.val();
+                        Object.values(products).forEach(product => {
+                            const productItem = document.createElement('li');
+                            productItem.textContent = `${product.name} (ID: ${product.id})`;
+                            productItem.dataset.productId = product.id;
+                            productItem.dataset.productType = 'houseware';
+                            productItem.classList.add('product-item');
+                            if (product.productImg) {
+                                const img = document.createElement('img');
+                                img.src = product.productImg;
+                                img.alt = `${product.name} Image`;
+                                img.style.width = '100px'; // Adjust as needed
+                                productItem.appendChild(img);
+                            }
+                            housewareList.appendChild(productItem);
+                        });
+                    }
+                }
+            });
+        }
+    
+        // Function to handle form population on product item click
+        function handleProductItemClick(event) {
+            const item = event.target;
+            if (item.classList.contains('product-item')) {
+                const productId = item.dataset.productId;
+                const productType = item.dataset.productType;
+    
+                // Fetch product details
+                const productRef = ref(db, `/${productType}/${productId}`);
+                get(productRef).then((snapshot) => {
+                    if (snapshot.exists()) {
+                        const product = snapshot.val();
+                        document.getElementById('update-product-id').value = product.id;
+                        document.getElementById('update-product-type').value = productType;
+                        document.getElementById('update-product-name').value = product.name;
+                        document.getElementById('update-price').value = product.price;
+                        document.getElementById('update-quantity').value = product.quantity;
+                        const updateProductImg = document.getElementById('update-product-img');
+                        if (product.productImg) {
+                            updateProductImg.src = product.productImg;
+                            updateProductImg.alt = `${product.name} Image`;
+                        } else {
+                            updateProductImg.src = '';
+                            updateProductImg.alt = 'No Image Available';
+                        }
+                    }
+                });
+            }
+        }
+    
+        // Function to handle form submission for updating a product
+        document.getElementById('update-product-form')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+    
+            const productId = document.getElementById('update-product-id').value;
+            const productType = document.getElementById('update-product-type').value;
+            const productName = document.getElementById('update-product-name').value;
+            const price = document.getElementById('update-price').value;
+            const quantity = document.getElementById('update-quantity').value;
+            const updateProductImg = document.getElementById('update-product-img').files[0];
+    
+            try {
+                let productImgUrl = null;
+                if (updateProductImg) {
+                    // Rename the image file based on the product ID
+                    const newFileName = `${productId}_${updateProductImg.name}`;
+                    // Upload image to Firebase Storage
+                    const imgRef = storageRef(storage, `images/${productType}/${newFileName}`);
+                    await uploadBytes(imgRef, updateProductImg);
+                    productImgUrl = await getDownloadURL(imgRef);
+                }
+    
+                // Prepare the updated product data
+                const updatedProduct = {
+                    id: productId,
+                    name: productName,
+                    price: parseFloat(price),
+                    quantity: parseInt(quantity),
+                    productImg: productImgUrl // Update the image URL here
+                };
+    
+                // Save the updated product to the database
+                await set(ref(db, `/${productType}/${productId}`), updatedProduct);
+    
+                // Clear the form after submission
+                document.querySelector('#update-product-form form')?.reset();
+    
+                alert('Product updated successfully!');
+            } catch (error) {
+                console.error("Error updating product:", error);
+            }
+        });
+    
+        // Function to handle cancel button click
+        document.querySelector('#update-product-form .cancel')?.addEventListener('click', () => {
+            document.querySelector('#update-product-form form')?.reset(); // Ensure you target the form element
+        });
+    
+        // Function to handle delete button click with confirmation
+        document.querySelector('#update-product-form .delete')?.addEventListener('click', async () => {
+            const productId = document.getElementById('update-product-id').value;
+            const productType = document.getElementById('update-product-type').value;
+            const productName = document.getElementById('update-product-name').value;
+            
+            if (!productId || !productType || !productName) {
+                alert('Product ID, type, or name is missing.');
+                return;
+            }
+        
+            // Construct the file name and path
+            const fileName = `${productId}_${productName}.jpg`.replace(/ /g, '_'); // Replace spaces with underscores
+            const filePath = `images/${productType}/${fileName}`;
+        
+            // Log for debugging
+            console.log(`Extracted File Name: ${fileName}`);
+            console.log(`File Path: ${filePath}`);
+        
+            if (confirm('Are you sure you want to delete this product?')) {
+                try {
+                    // Delete product from the database
+                    await remove(ref(db, `/${productType}/${productId}`));
+                    
+                    // Construct file reference
+                    const imgRef = storageRef(storage, filePath);
+                    
+                    // Delete image from Firebase Storage
+                    await deleteObject(imgRef);
+        
+                    alert('Product deleted successfully!');
+        
+                    // Clear the form after deletion
+                    document.querySelector('#update-product-form form')?.reset();
+                } catch (error) {
+                    console.error("Error deleting product:", error);
+                }
+            }
+        });
+
+          // Function to load feedback
+          function loadFeedback() {
+            const feedbackRef = ref(db, 'feedback/');
+            onValue(feedbackRef, (snapshot) => {
+                const feedbackDisplay = document.getElementById('feedback-display');
+                if (feedbackDisplay) {
+                    feedbackDisplay.innerHTML = '';
+                    if (snapshot.exists()) {
+                        const feedbacks = snapshot.val();
+                        Object.values(feedbacks).forEach(feedback => {
+                            const feedbackItem = document.createElement('div');
+                            feedbackItem.classList.add('feedback-item');
+                            feedbackItem.innerHTML = `
+                                <p><strong>${feedback.name || 'Anonymous'}</strong></p>
+                                <p>${feedback.message}</p>
+                                <p><small>${new Date(feedback.createdAt).toLocaleString()}</small></p>
+                            `;
+                            feedbackDisplay.appendChild(feedbackItem);
+                        });
+                    }
+                }
+            });
+        }
+    
+        // Function to load contact submissions
+        function loadContacts() {
+            const contactsRef = ref(db, 'contact/');
+            onValue(contactsRef, (snapshot) => {
+                const contactDisplay = document.getElementById('contact-display');
+                if (contactDisplay) {
+                    contactDisplay.innerHTML = '';
+                    if (snapshot.exists()) {
+                        const contacts = snapshot.val();
+                        const sortedContacts = Object.values(contacts).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                        const recentContacts = sortedContacts.slice(0, 10); // Latest 10 submissions
+                        recentContacts.forEach(contact => {
+                            const contactItem = document.createElement('div');
+                            contactItem.classList.add('contact-item');
+                            contactItem.innerHTML = `
+                                <p><strong>${contact.name || 'Anonymous'}</strong></p>
+                                <p>${contact.message}</p>
+                                <p><small>${new Date(contact.createdAt).toLocaleString()}</small></p>
+                            `;
+                            contactDisplay.appendChild(contactItem);
+                        });
+                    }
+                }
+            });
+        }
+       // Function to load user registrations
+        function loadUsers() {
+            const usersRef = ref(db, 'users/');
+            onValue(usersRef, (snapshot) => {
+                const usersDisplay = document.getElementById('users-display');
+                if (usersDisplay) {
+                    usersDisplay.innerHTML = '';
+                    if (snapshot.exists()) {
+                        const users = snapshot.val();
+                        Object.values(users).forEach(user => {
+                            const userItem = document.createElement('div');
+                            userItem.classList.add('user-item');
+                            userItem.innerHTML = `
+                                <p><strong>Email:</strong> ${user.username || 'No email provided'}</p>
+                                <p><small>Registered at: ${user.createdAt ? new Date(user.createdAt).toLocaleString() : 'Unknown'}</small></p>
+                            `;
+                            usersDisplay.appendChild(userItem);
+                        });
+                    } else {
+                        usersDisplay.innerHTML = '<p>No users found.</p>';
+                    }
+                }
+            }, (error) => {
+                console.error("Error loading user data:", error);
+            });
+        }
+    
+        // Load initial data
+        loadFeedback();
+        loadContacts();
+        loadUsers();
+        
+    
+        // Load products on page load
+        window.onload = loadProducts;
+        document.getElementById('school-supplies-list')?.addEventListener('click', handleProductItemClick);
+        document.getElementById('houseware-list')?.addEventListener('click', handleProductItemClick);
+    </script>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    <script  src="js/adminscript.js"></script>
+</body>
+</html>
