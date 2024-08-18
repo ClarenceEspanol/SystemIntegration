@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
-import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, updatePassword } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+import { getDatabase, ref, onValue, set, serverTimestamp  } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, updatePassword ,createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 
 // Your Firebase configuration
 const firebaseConfig = {
@@ -544,7 +544,9 @@ if (registerForm) {
             const userCredential = await createUserWithEmailAndPassword(auth, username, password);
             const userId = userCredential.user.uid;
 
-            await set(ref(db, "/users/" + userId), {
+            // Store user data in Firebase Realtime Database
+            await set(ref(db, `/users/${userId}`), {
+                uid: userId, // Store the user ID
                 username: username,
                 createdAt: serverTimestamp()
             });
@@ -839,3 +841,5 @@ document.querySelector('.navbar a[href="#login-modal"]').addEventListener('click
     e.preventDefault();
     showModal();
 });
+
+

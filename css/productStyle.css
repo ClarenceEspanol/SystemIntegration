@@ -36,6 +36,7 @@ section{
     padding: 2rem 7%;
 }
 .heading{
+    margin-top: 6rem;
     text-align: center;
     color: #fff;
     text-transform: uppercase;
@@ -57,9 +58,8 @@ section{
 }
 .btn:hover{
     letter-spacing: .2rem;
-
 }
-.header{
+.header {
     background: var(--bg);
     display: flex;
     align-items: center;
@@ -70,116 +70,338 @@ section{
     top: 0; left: 0; right: 0;
     z-index: 1000;
 }
-.title{
-    position: relative;
+
+.title {
     font-size: 2rem;
     color: #fff;
-    margin-right: 50rem;
+    margin: 0;
 }
-.header.logo img{
+
+.header .logo img {
     height: 6rem;
 }
-.header .navbar a{
+
+.header .navbar {
+    display: flex;
+    align-items: center;
+}
+
+.header .navbar a {
     margin: 0 1rem;
     font-size: 1.6rem;
     color: #fff;
+    text-decoration: none; /* Remove underline for links */
 }
-.header .navbar a:hover{
+
+.header .navbar a:hover {
     color: var(--main-color);
     border-bottom: .1rem solid var(--main-color);
     padding-bottom: .5rem;
 }
-.header .icons div{
+
+.header .icons {
+    display: flex;
+    align-items: center;
+}
+
+.header .icons div {
     color: #fff;
     cursor: pointer;
     font-size: 2.5rem;
     margin-left: 2rem;
 }
-.header .icons div:hover{
+
+.header .icons div:hover {
     color: var(--main-color);
 }
-#menu-btn{
+
+#menu-btn {
     display: none;
 }
-.header .search-form{
-    position: absolute;
-    top: 115%; right: 7%;
-    background: #fff;
-    width: 50rem;
-    height: 5rem;
-    display: flex;
-    align-items: center;
-    transform: scaleY(0);
-    transform-origin: top;
-}
 
-.header .search-form.active{
-    transform: scaleY(1)
-}
-
-.header .search-form input{
-    height: 100%;
-    width: 100%;
-    font-size: 1.6rem;
-    color: var(--black);
-    padding: 1rem;
-    text-transform: none;
-}
-.header .search-form label{
-    cursor: pointer;
-    font-size: 2.2rem;
-    margin-right: 1.5rem;
-    color: var(--black);
-}
-.header .search-form label:hover{
-    color: var(--main-color);
-}
-.header .cart-items-container{
+.header .cart-items-container {
     position: absolute;
-    top: 100%; right: -100%;
+    top: 100%;
+    right: -100%;
     height: calc(100vh - 9.5rem);
     width: 35rem;
     background: #fff;
-    padding: 0 1.5rem;
+    padding: 1.5rem; /* Adjust padding */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add shadow for better visibility */
+    transition: right 0.3s ease; /* Smooth transition for opening/closing */
 }
 
-.header .cart-items-container.active{
+.header .cart-items-container.active {
     right: 0;
 }
 
-
-.header .cart-items-container .cart-item{
+.header .cart-items-container .cart-item {
     position: relative;
     margin: 2rem 0;
     display: flex;
     align-items: center;
     gap: 1.5rem;
 }
-.header .cart-items-container .cart-item .fa-times{
+
+.header .cart-items-container .cart-item .remove-btn {
     position: absolute;
-    top: 1rem; right: 1rem;
+    top: 1rem;
+    right: 1rem;
     font-size: 2rem;
     cursor: pointer;
     color: var(--black);
 }
-.header .cart-items-container .cart-item .fa-times:hover{
+
+.header .cart-items-container .cart-item .remove-btn:hover {
     color: var(--main-color);
 }
-.header .cart-items-container .cart-item img{
+
+.header .cart-items-container .cart-item .item-image img {
     height: 7rem;
 }
-.header .cart-items-container .cart-item .content h3{
+
+.header .cart-items-container .cart-item .item-details {
+    flex: 1;
+}
+
+.header .cart-items-container .cart-item .item-details .item-name {
     font-size: 2rem;
     color: var(--black);
-    padding-bottom: .5rem;
+    margin: 0;
 }
-.header .cart-items-container .cart-item .content .price{
+
+.header .cart-items-container .cart-item .item-details .item-price {
     font-size: 1.5rem;
     color: var(--main-color);
 }
-.header .cart-items-container .btn{
-    width: 100%;
+
+.header .cart-items-container .cart-item .item-details .item-quantity {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.header .cart-items-container .cart-item .item-details .quantity-btn {
+    background-color: var(--main-color);
+    color: #fff;
+    border: none;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+}
+
+.header .cart-items-container .cart-item .item-details .quantity-btn:hover {
+    background-color: var(--main-color-dark);
+}
+
+
+.user-menu {
+    display: flex;
+    align-items: center;
+}
+#view-profile-btn{
+    text-decoration: none;
+    font-size: 1.2rem;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    background: var(--main-color);
+    color: #fff;
+}
+
+#logout-btn{
+    text-decoration: none;
+    font-size: 1.2rem;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    background: var(--main-color);
+    color: #fff;
+}
+#view-profile-btn:hover{
+    color: #010103; /* Set text color on hover */
+    background: #fff;
+}
+#logout-btn:hover{
+    color: #010103; /* Set text color on hover */
+    background: #fff;
+}
+
+.home{
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    background: url(../images/storebg.png) no-repeat;
+    background-size: cover;
+    background-position: center;
+}
+.home .content{
+    max-width: 60rem;
+}
+.home .content h3{
+    font-size: 6rem;
+    text-transform: uppercase;
+    color: #fff;
+}
+.home .content p{
+    font-size: 1.5rem;
+    color: #eee;
+    font-weight: lighter;
+    line-height: 1.8;
+    padding: 1rem 0;
+}
+.school {
     text-align: center;
+}
+.stock{
+    font-size: 1.5rem;
+    color: #fff;
+    text-align: center;
+}
+.school .box-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+    position: relative;
+}
+
+.school .box-container .box {
+    text-align: center;
+    border: var(--border);
+    padding: 2rem;
+    flex: 1 1 calc(33.333% - 1.5rem);
+    box-sizing: border-box;
+}
+
+.school .box-container .box .icons a {
+    height: 5rem;
+    width: 5rem;
+    line-height: 5rem;
+    font-size: 2rem;
+    border: var(--border);
+    color: #fff;
+    margin: .3rem;
+}
+
+.school .box-container .box .icons a:hover {
+    background: var(--main-color);
+}
+
+.school .box-container .box .image {
+    padding: 2.5rem 0;
+}
+
+.school .box-container .box .image img {
+    height: 15rem;
+}
+
+.school .box-container .box .content h3 {
+    color: #fff;
+    font-size: 2.5rem;
+}
+
+.school .box-container .box .content .stars {
+    padding: 1.5rem;
+}
+
+.school .box-container .box .content .stars i {
+    font-size: 1.7rem;
+    color: var(--main-color);
+}
+
+.school .box-container .box .content .price {
+    color: #fff;
+    font-size: 2.5rem;
+}
+
+.school .box-container .box .content .price span {
+    text-decoration: line-through;
+    font-weight: lighter;
+    font-size: 1.5rem;
+}
+
+.school .show {
+    flex: 1 1 100%;
+    text-align: center;
+    margin-top: 1rem;
+}
+
+
+.houseware {
+    text-align: center;
+}
+.stock{
+    font-size: 1.5rem;
+    color: #fff;
+    text-align: center;
+}
+.houseware .box-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+    position: relative;
+}
+
+.houseware .box-container .box {
+    text-align: center;
+    border: var(--border);
+    padding: 2rem;
+    flex: 1 1 calc(33.333% - 1.5rem);
+    box-sizing: border-box;
+}
+
+.houseware .box-container .box .icons a {
+    height: 5rem;
+    width: 5rem;
+    line-height: 5rem;
+    font-size: 2rem;
+    border: var(--border);
+    color: #fff;
+    margin: .3rem;
+}
+
+.houseware .box-container .box .icons a:hover {
+    background: var(--main-color);
+}
+
+.houseware .box-container .box .image {
+    padding: 2.5rem 0;
+}
+
+.houseware .box-container .box .image img {
+    height: 15rem;
+}
+
+.houseware .box-container .box .content h3 {
+    color: #fff;
+    font-size: 2.5rem;
+}
+
+.houseware .box-container .box .content .stars {
+    padding: 1.5rem;
+}
+
+.houseware .box-container .box .content .stars i {
+    font-size: 1.7rem;
+    color: var(--main-color);
+}
+
+.houseware .box-container .box .content .price {
+    color: #fff;
+    font-size: 2.5rem;
+}
+
+.houseware .box-container .box .content .price span {
+    text-decoration: line-through;
+    font-weight: lighter;
+    font-size: 1.5rem;
+}
+
+.houseware .show {
+    flex: 1 1 100%;
+    text-align: center;
+    margin-top: 1rem;
 }
 .quantity input {
     width: 50px;
@@ -193,16 +415,20 @@ section{
 .icons {
     position: relative;
 }
+#cart-btn {
+    position: relative; 
+}
 
 .cart-count {
     position: absolute;
-    top: -10px;
-    right: -10px;
+    top: -10px; 
+    right: -10px; 
     background-color: red;
     color: white;
     border-radius: 50%;
     padding: 2px 6px;
     font-size: 12px;
+    z-index: 10;
 }
 .cart-total {
     font-size: 1.5rem;
@@ -211,6 +437,7 @@ section{
     font-weight: bold;
 }
 
+/* Modal Background */
 .modal {
     display: none;
     position: fixed;
@@ -232,9 +459,12 @@ section{
     width: 90%;
     max-width: 400px; 
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
-    position: relative;
+    position: fixed; /* Changed from relative to fixed */
     top: 50%;
-    transform: translateY(-50%); /* Center vertically */
+    left: 50%; 
+    transform: translate(-50%, -50%); /* Center both vertically and horizontally */
+    max-height: 80vh; /* Ensure modal does not exceed viewport height */
+    overflow-y: auto; /* Allow scrolling if content overflows */
 }
 
 /* Close Button */
@@ -266,6 +496,10 @@ section{
 .modal-content form {
     display: flex;
     flex-direction: column;
+}
+
+.modal form input {
+    text-transform: none;
 }
 
 /* Label Styling */
@@ -323,48 +557,210 @@ section{
     text-decoration: underline;
 }
 
-.footer{
-    background: var(--black);
-    text-align: center;
+/* Animate to Cart */
+.animate-to-cart {
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 1000;
 }
-.footer .share{
-    padding: 1rem 0;
+
+/* Background Blur */
+.modal-active .background-blur {
+    filter: blur(5px); /* Adjust the blur amount as needed */
+    pointer-events: none; /* Ensure background content is not interactive */
 }
-.footer .share a{
-   height: 5rem;
-   width: 5rem;
-   line-height: 5rem;
-   font-size: 2rem;
-   color: #fff;
-   border: var(--border);
-   margin: .3rem;
-   border-radius: 50%;
+
+/* Ensure modal is positioned correctly */
+#login-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+    display: none; /* Hidden by default */
 }
-.footer .share a:hover{
-    background-color: var(--main-color);
+
+
+
+
+
+
+#feedback-display {
+    font-family: Arial, sans-serif; /* Use a readable font */
+    font-size: 16px; /* Set a base font size */
+    color: #fff; /* Dark color for better readability */
+    text-align: center; /* Center the text */
+    margin: 20px auto; /* Center the entire section */
+    max-width: 100%; /* Use full width for grid layout */
+    padding: 10px; /* Add padding for spacing */
+    background-color: var(--bg); /* Light background for contrast */
+    border-radius: 8px; /* Rounded corners for a modern look */
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    display: grid; /* Use CSS Grid */
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* 3 items per row */
+    gap: 20px; /* Space between items */
 }
-.footer .links{
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    padding: 2rem 0;
-    gap: 1rem;
+
+#feedback-display .feedback-item {
+    padding: 1.5rem; /* Add padding to each feedback item */
+    border: var(--border); /* Add border around each item */
+    border-radius: 8px; /* Rounded corners for each feedback item */
+    background-color: var(--item-bg); /* Background color for each item */
 }
-.footer .links a{
-    padding: .7rem 2rem;
-    color: #fff;
-    border: var(--border);
-    font-size: 2rem;
+
+#feedback-display .feedback-item .name {
+    font-size: 1.5rem; /* Adjust font size for the name */
+    font-weight: bold; /* Make the name bold */
+    color: var(--main-color); /* Use the main color for the name */
+    margin-bottom: 1rem; /* Space below the name */
 }
-.footer .links a:hover{
-    background-color: var(--main-color);
+
+#feedback-display .feedback-item .message {
+    font-size: 1.2rem; /* Standard font size for the message */
+    line-height: 1.5; /* Line height for better readability */
+    color: #ccc; /* Use a lighter shade for the message text */
 }
-.footer .credit{
-    font-size: 2rem;
-    color: #fff;
-    font-weight: lighter;
-    padding: 1.5rem;
+
+
+
+@media (max-width: 991px) {
+
+    /* Ensure the menu button is visible on screens 991px or less */
+    #menu-btn {
+        display: inline-block;
+        cursor: pointer; /* Add cursor pointer for better user experience */
+    }
+
+    /* Style the navbar for mobile view */
+    .header .navbar {
+        position: absolute;
+        top: 100%; /* Position below the header */
+        right: 0; /* Align with the right edge */
+        background: #fff;
+        width: 40%; /* Set a fixed width for the navbar */
+        max-width: 400px; /* Optional: Set a max-width for the navbar */
+        height: calc(100vh - 9.5rem); /* Adjust height */
+        display: flex;
+        flex-direction: column; /* Stack items in a column */
+        align-items: center; /* Center items horizontally */
+        justify-content: flex-start; /* Align items to the top */
+        padding-top: 1rem; /* Add some space from the top */
+        transition: transform 0.3s ease; /* Smooth transition for showing/hiding */
+        transform: translateX(100%); /* Hide off-screen initially */
+    }
+
+    .header .navbar.active {
+        transform: translateX(0); /* Show the navbar */
+    }
+
+    .header .navbar a {
+        color: var(--black);
+        display: block;
+        margin: 1rem 0; /* Space between links */
+        font-size: 2rem;
+        padding: 0.5rem 1rem; /* Padding for better touchability */
+        text-align: center; /* Center-align text */
+    }
+
+    #feedback-display {
+        padding: 1.5rem; /* Adjust padding on smaller screens */
+    }
+
+    #feedback-display .feedback-item .name {
+        font-size: 1.8rem; /* Slightly smaller font on smaller screens */
+    }
+
+    #feedback-display .feedback-item .message {
+        font-size: 1.6rem; /* Adjust message size on smaller screens */
+    }
 }
-.footer .credit span{
-    color: var(--main-color);
+
+@media (max-width: 768px) {
+
+    /* Adjustments for screens smaller than 768px */
+    html {
+        font-size: 55%; /* Adjust font size for smaller screens */
+    }
+
+    .header {
+        padding: 1.5rem 2rem; /* Adjust header padding */
+    }
+
+    section {
+        padding: 2rem; /* Adjust section padding */
+    }
+
+    .home {
+        background-position: left;
+        justify-content: center;
+        text-align: center;
+    }
+
+    .home .content h3 {
+        font-size: 4.5rem;
+    }
+
+    .home .content p {
+        font-size: 1rem;
+    }
+
+    .modal-content {
+        width: 90%;
+        padding: 1.5rem;
+        max-width: 300px; /* Remove max-width to fit smaller screens */
+        top: 50%;
+        transform: translateY(-50%); /* Ensure vertical centering */
+    }
+
+    .modal-content h2 {
+        font-size: 1.6rem; /* Smaller font size for headings */
+    }
+
+    .modal-content form label {
+        font-size: 1.4rem; /* Smaller font size for labels */
+    }
+
+    .modal-content form input {
+        font-size: 1.4rem; /* Smaller font size for inputs */
+        padding: 0.8rem; /* Smaller padding */
+    }
+
+    .modal-content form button {
+        font-size: 1.5rem; /* Smaller font size for buttons */
+        padding: 0.8rem; /* Smaller padding */
+    }
+}
+
+@media (max-width: 450px) {
+
+    /* Adjustments for screens smaller than 450px */
+    html {
+        font-size: 50%;
+    }
+
+    .modal-content {
+        width: 95%;
+        padding: 1rem;
+        top: 50%;
+        transform: translateY(-50%); /* Ensure vertical centering */
+    }
+
+    .modal-content h2 {
+        font-size: 1.4rem; /* Further reduce heading font size */
+    }
+
+    .modal-content form label {
+        font-size: 1.2rem; /* Further reduce label font size */
+    }
+
+    .modal-content form input {
+        font-size: 1.2rem; /* Further reduce input font size */
+        padding: 0.6rem; /* Further reduce padding */
+    }
+
+    .modal-content form button {
+        font-size: 1.3rem; /* Further reduce button font size */
+        padding: 0.6rem; /* Further reduce padding */
+    }
 }
