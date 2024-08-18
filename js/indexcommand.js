@@ -218,28 +218,6 @@ document.getElementById('logout-btn').addEventListener('click', () => {
     });
 });
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // Reference to the 'School Supplies' node
 const dbRefSchoolSupplies = ref(db, "school-supplies");
 const dbRefHouseware = ref(db, "houseware");
@@ -372,7 +350,7 @@ function addToCart(event) {
     const button = event.currentTarget;
     const productID = button.getAttribute('data-id');
     const type = button.getAttribute('data-type');
-    
+
     let productRef;
     if (type === 'school-supplies') {
         productRef = ref(db, `school-supplies/${productID}`);
@@ -391,7 +369,8 @@ function addToCart(event) {
                 cart.push({ ...product, id: productID, quantity: 1 });
             }
 
-            localStorage.setItem('cart', JSON.stringify(cart));
+            // Save updated cart to Firebase
+            saveCartToFirebase();
             updateCartDisplay();
         }
     });
@@ -400,7 +379,9 @@ function addToCart(event) {
 // Function to handle removing items from the cart
 function removeFromCart(productID) {
     cart = cart.filter(item => item.id !== productID);
-    localStorage.setItem('cart', JSON.stringify(cart));
+    
+    // Save updated cart to Firebase
+    saveCartToFirebase();
     updateCartDisplay();
 }
 
@@ -412,10 +393,28 @@ function updateQuantity(productID, quantity) {
         if (cartItem.quantity <= 0) {
             removeFromCart(productID);
         } else {
-            localStorage.setItem('cart', JSON.stringify(cart));
+            // Save updated cart to Firebase
+            saveCartToFirebase();
             updateCartDisplay();
         }
     }
+}
+
+// Function to save the current cart to Firebase
+function saveCartToFirebase() {
+    const cartRef = ref(db, 'cart-items');
+    set(cartRef, cart);
+}
+
+// Function to load the cart from Firebase and update the display
+function loadCartFromFirebase() {
+    const cartRef = ref(db, 'cart-items');
+    onValue(cartRef, (snapshot) => {
+        if (snapshot.exists()) {
+            cart = snapshot.val();
+            updateCartDisplay();
+        }
+    });
 }
 
 // Function to update the cart display
@@ -480,10 +479,10 @@ function calculateCartTotal() {
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
+    loadCartFromFirebase(); // Load the cart from Firebase on page load
     displayProducts();
     displayHousewareProducts();
 });
-
 
 
 
@@ -840,16 +839,3 @@ document.querySelector('.navbar a[href="#login-modal"]').addEventListener('click
     e.preventDefault();
     showModal();
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
