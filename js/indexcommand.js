@@ -490,6 +490,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
+// Ensure this script is executed after DOMContentLoaded
+document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.querySelector('.modal');
+    const modalContent = document.querySelector('.modal-content');
+
+    function centerModal() {
+        const windowHeight = window.innerHeight;
+        const modalHeight = modalContent.offsetHeight;
+
+        if (modalHeight < windowHeight) {
+            modalContent.style.top = '50%';
+            modalContent.style.transform = 'translate(-50%, -50%)';
+        } else {
+            modalContent.style.top = '10px';
+            modalContent.style.transform = 'translate(-50%, 0)';
+        }
+    }
+
+    window.addEventListener('resize', centerModal);
+});
+
 // Show Modal Function
 function showModal() {
     const modal = document.getElementById('login-modal');

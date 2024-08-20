@@ -659,40 +659,40 @@ section{
     font-weight: bold;
 }
 
+
+
 /* Modal Background */
 .modal {
-    display: none;
+    display: none; /* Hidden by default */
     position: fixed;
-    z-index: 1;
+    z-index: 1; /* Sit on top */
     left: 0;
     top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgba(0, 0, 0, 0.5);
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgba(0, 0, 0, 0.5); /* Black w/ opacity */
 }
 
-/* Modal Content */
+/* Default style for larger screens */
 .modal-content {
-    background: #fff;
-    margin: auto;
-    padding: 2rem; 
-    border-radius: 8px; 
     width: 90%;
-    max-width: 400px; 
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
-    position: fixed; /* Changed from relative to fixed */
+    max-width: 400px;
+    padding: 1rem;
+    position: fixed;
     top: 50%;
-    left: 50%; 
-    transform: translate(-50%, -50%); /* Center both vertically and horizontally */
-    max-height: 80vh; /* Ensure modal does not exceed viewport height */
-    overflow-y: auto; /* Allow scrolling if content overflows */
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    transition: transform 0.3s ease;
 }
 
 /* Close Button */
 .close-modal {
     color: #333;
-    float: right;
     font-size: 30px; /* Increased size */
     font-weight: bold;
     cursor: pointer;
@@ -709,9 +709,9 @@ section{
 
 /* Modal Heading */
 .modal-content h2 {
-    font-size: 2rem; 
+    font-size: 2rem;
     color: var(--black);
-    margin-bottom: 1rem; 
+    margin-bottom: 1rem;
 }
 
 /* Form Elements */
@@ -720,25 +720,22 @@ section{
     flex-direction: column;
 }
 
-.modal form input {
-    text-transform: none;
-}
-
 /* Label Styling */
 .modal-content form label {
     font-size: 1.6rem;
     color: var(--black);
-    margin-bottom: 0.5rem; 
+    margin-bottom: 0.5rem;
 }
 
 /* Input Styling */
 .modal-content form input {
+    text-transform: none;
     font-size: 1.6rem;
     padding: 1rem;
-    margin-bottom: 1rem; 
+    margin-bottom: 1rem;
     border: 2px solid black;
-    border-radius: 4px; 
-    background: #fff; 
+    border-radius: 4px;
+    background: #fff;
 }
 
 /* Submit Button */
@@ -746,14 +743,14 @@ section{
     padding: 1rem;
     font-size: 1.7rem;
     color: #fff;
-    background: var(--main-color); 
+    background: var(--main-color);
     border: none;
-    border-radius: 4px; 
+    border-radius: 4px;
     cursor: pointer;
 }
 
 .modal-content form button:hover {
-    background: var(--black); 
+    background: var(--black);
 }
 
 /* Form Switching */
@@ -927,30 +924,31 @@ section{
         font-size: 1rem;
     }
 
+    /* Adjustments for screens smaller than 768px */
     .modal-content {
-        width: 90%;
-        padding: 1.5rem;
-        max-width: 300px; /* Remove max-width to fit smaller screens */
+        width: 80%;
+        padding: 1rem;
+        border-radius: 5px;
         top: 50%;
-        transform: translateY(-50%); /* Ensure vertical centering */
+        left: 25%;
     }
 
     .modal-content h2 {
-        font-size: 1.6rem; /* Smaller font size for headings */
+        font-size: 1.6rem;
     }
 
-    .modal-content form label {
-        font-size: 1.4rem; /* Smaller font size for labels */
-    }
-
-    .modal-content form input {
-        font-size: 1.4rem; /* Smaller font size for inputs */
-        padding: 0.8rem; /* Smaller padding */
+    .modal-content form label,
+    .modal-content form input,
+    .modal-content form button {
+        font-size: 1.4rem;
+        padding: 0.8rem;
     }
 
     .modal-content form button {
-        font-size: 1.5rem; /* Smaller font size for buttons */
-        padding: 0.8rem; /* Smaller padding */
+        width: 100%;
+        padding: 0.8rem;
+        font-size: 1.4rem;
+        margin-top: 1rem; /* Add space above the button */
     }
 }
 
@@ -961,28 +959,34 @@ section{
         font-size: 50%;
     }
 
+    /* Adjustments for screens smaller than 450px */
     .modal-content {
         width: 95%;
-        padding: 1rem;
+        padding: 0.5rem;
+        border-radius: 5px;
         top: 50%;
-        transform: translateY(-50%); /* Ensure vertical centering */
+        left: 24%;
     }
 
     .modal-content h2 {
-        font-size: 1.4rem; /* Further reduce heading font size */
+        font-size: 1.4rem;
     }
 
-    .modal-content form label {
-        font-size: 1.2rem; /* Further reduce label font size */
-    }
-
-    .modal-content form input {
-        font-size: 1.2rem; /* Further reduce input font size */
-        padding: 0.6rem; /* Further reduce padding */
+    .modal-content form label,
+    .modal-content form input,
+    .modal-content form button {
+        font-size: 1.2rem;
+        padding: 0.6rem;
     }
 
     .modal-content form button {
-        font-size: 1.3rem; /* Further reduce button font size */
-        padding: 0.6rem; /* Further reduce padding */
+        width: 100%;
+        padding: 0.6rem;
+        font-size: 1.2rem;
+        margin-top: 1rem;
+    }
+
+    .modal-content .register-link {
+        font-size: 0.9rem;
     }
 }
