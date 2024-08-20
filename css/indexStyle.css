@@ -881,6 +881,15 @@ section{
         padding: 0.5rem 1rem; /* Padding for better touchability */
         text-align: center; /* Center-align text */
     }
+    /* Adjustments for screens smaller than 768px */
+    .modal-content {
+        max-width: 350px;
+        width: 80%;
+        padding: 1rem;
+        border-radius: 5px;
+        top: 50%;
+        left: 30%;
+    }
 
     #feedback-display {
         padding: 1.5rem; /* Adjust padding on smaller screens */
@@ -926,7 +935,8 @@ section{
 
     /* Adjustments for screens smaller than 768px */
     .modal-content {
-        width: 80%;
+        max-width: 300px;
+        width: 100%;
         padding: 1rem;
         border-radius: 5px;
         top: 50%;
@@ -961,11 +971,12 @@ section{
 
     /* Adjustments for screens smaller than 450px */
     .modal-content {
-        width: 95%;
+        max-width: 200px;
+        width: 50%;
         padding: 0.5rem;
         border-radius: 5px;
         top: 50%;
-        left: 24%;
+        left: 30%;
     }
 
     .modal-content h2 {
