@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
+import { getDatabase, ref, onValue, set, remove } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 
 const firebaseConfig = {
@@ -19,10 +19,7 @@ const auth = getAuth(app);
 const dbRefSchoolSupplies = ref(db, 'school-supplies');
 const dbRefHouseware = ref(db, 'houseware');
 
-// Cart initialization
-let cart = JSON.parse(localStorage.getItem('cart')) || [];
-updateCartDisplay();
-
+let cart = [];
 let isLoggedIn = false;
 let userId = null;
 
@@ -30,13 +27,12 @@ onAuthStateChanged(auth, (user) => {
     if (user) {
         isLoggedIn = true;
         userId = user.uid;
-        // Fetch user-specific cart data from Firebase
-        fetchCartData();
+        fetchCartData();  // Fetch cart data when user logs in
     } else {
         isLoggedIn = false;
         userId = null;
-        // Reset cart data if not logged in
         cart = [];
+        localStorage.setItem('cart', JSON.stringify(cart));
         updateCartDisplay();
     }
 });
@@ -116,106 +112,133 @@ function createProductBox(product, type) {
     return box;
 }
 
-function addToCart(event) {
-    if (event.target.classList.contains('add-to-cart-btn')) {
-        event.preventDefault();
-        if (!isLoggedIn) {
-            showLoginModal();
-            return;
-        }
-
-        const button = event.currentTarget;
-        const productID = button.getAttribute('data-id');
-        const type = button.getAttribute('data-type');
-
-        let productRef;
-        if (type === 'school-supplies') {
-            productRef = ref(db, `school-supplies/${productID}`);
-        } else if (type === 'houseware') {
-            productRef = ref(db, `houseware/${productID}`);
-        }
-
-        onValue(productRef, (snapshot) => {
-            if (snapshot.exists()) {
-                const product = snapshot.val();
-                const cartItem = cart.find(item => item.id === productID);
-
-                if (cartItem) {
-                    cartItem.quantity++;
-                } else {
-                    cart.push({ ...product, id: productID, quantity: 1 });
-                }
-
-                if (userId) {
-                    set(ref(db, `users/${userId}/cart-items`), cart);  // Update here
-                }
-
-                // Save updated cart to local storage
-                localStorage.setItem('cart', JSON.stringify(cart));
-                updateCartDisplay();
-            }
-        });
-    }
-}
-
+// Fetch cart data from Firebase and update local storage and display
 function fetchCartData() {
-    if (userId) {
-        const userCartRef = ref(db, `users/${userId}/cart-items`);  // Update here
-        onValue(userCartRef, (snapshot) => {
-            if (snapshot.exists()) {
-                cart = snapshot.val();
-                localStorage.setItem('cart', JSON.stringify(cart));
-                updateCartDisplay();
-            } else {
-                cart = [];
-                localStorage.setItem('cart', JSON.stringify(cart));
-                updateCartDisplay();
-            }
-        });
-    }
+    const cartRef = ref(db, 'cart-items');  // Fetch cart items from `cart-items` node
+
+    onValue(cartRef, (snapshot) => {
+        if (snapshot.exists()) {
+            cart = [];
+            snapshot.forEach(childSnapshot => {
+                const product = childSnapshot.val();
+                cart.push(product);
+            });
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCartDisplay();
+        } else {
+            cart = [];
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCartDisplay();
+        }
+    }, (error) => {
+        console.error('Error fetching cart data from Firebase:', error);
+    });
 }
 
+// Function to handle adding items to the cart
+function addToCart(event) {
+    event.preventDefault();
+    const button = event.currentTarget;
+    const productID = button.getAttribute('data-id');
+    const type = button.getAttribute('data-type');
+
+    let productRef;
+    if (type === 'school-supplies') {
+        productRef = ref(db, `school-supplies/${productID}`);
+    } else if (type === 'houseware') {
+        productRef = ref(db, `houseware/${productID}`);
+    }
+
+    // Fetch product data
+    onValue(productRef, (snapshot) => {
+        if (snapshot.exists()) {
+            const product = snapshot.val();
+            
+            // Check if the product is already in the cart
+            const cartItemIndex = cart.findIndex(item => item.id === productID);
+
+            if (cartItemIndex > -1) {
+                // Update existing item quantity
+                cart[cartItemIndex].quantity++;
+            } else {
+                // Add new item with initial quantity of 1
+                cart.push({ ...product, id: productID, quantity: 1 });
+            }
+
+            // Save updated cart to Firebase
+            saveCartToFirebase();
+            updateCartDisplay();
+        } else {
+            console.log('Product does not exist in Firebase.');
+        }
+    }, (error) => {
+        console.error('Error fetching product data from Firebase:', error);
+    });
+}
+
+
+
+
+// Function to handle updating item quantity in the cart
 function updateQuantity(productID, quantity) {
-    const cartItem = cart.find(item => item.id === productID);
-    if (cartItem) {
-        cartItem.quantity = quantity;
-        if (cartItem.quantity <= 0) {
+    const cartItemIndex = cart.findIndex(item => item.id === productID);
+    if (cartItemIndex > -1) {
+        if (quantity <= 0) {
             removeFromCart(productID);
         } else {
-            // Save updated cart to local storage
-            if (userId) {
-                set(ref(db, `users/${userId}/cart-items`), cart);  // Update here
-            }
-            localStorage.setItem('cart', JSON.stringify(cart));
+            cart[cartItemIndex].quantity = quantity;
+            // Save updated cart to Firebase
+            saveCartToFirebase();
             updateCartDisplay();
         }
     }
 }
 
+// Function to handle removing items from the cart
 function removeFromCart(productID) {
     cart = cart.filter(item => item.id !== productID);
-
-    // Save updated cart to local storage
-    if (userId) {
-        set(ref(db, `users/${userId}/cart-items`), cart);  // Update here
-    }
-    localStorage.setItem('cart', JSON.stringify(cart));
+    // Save updated cart to Firebase
+    saveCartToFirebase();
     updateCartDisplay();
 }
 
-function showLoginModal() {
-    const loginModal = document.querySelector('#login-modal');
-    if (loginModal) {
-        loginModal.style.display = 'block';
-    }
+// Function to save the current cart to Firebase
+function saveCartToFirebase() {
+    const cartRef = ref(db, 'cart-items');
+
+    // Convert cart array to an object with product IDs as keys
+    const cartObject = cart.reduce((acc, item) => {
+        acc[item.id] = item;
+        return acc;
+    }, {});
+
+    set(cartRef, cartObject).then(() => {
+        console.log('Cart saved successfully');
+    }).catch((error) => {
+        console.error('Error saving cart to Firebase:', error);
+    });
 }
 
+
+// Function to load the cart from Firebase and update the display
+function loadCartFromFirebase() {
+    const cartRef = ref(db, 'cart-items');
+    onValue(cartRef, (snapshot) => {
+        if (snapshot.exists()) {
+            cart = snapshot.val();
+            if (!Array.isArray(cart)) {
+                cart = []; // Reset to empty array if data is not an array
+            }
+            updateCartDisplay();
+        }
+    });
+}
+
+// Function to update the cart display
 function updateCartDisplay() {
     const cartItemsContainer = document.querySelector('#cart-items');
     const cartCount = document.querySelector('#cart-count');
     const cartTotal = document.querySelector('.cart-total .price');
-
-    if (!cartItemsContainer || !cartCount || !cartTotal) return;
 
     // Update cart count
     cartCount.textContent = cart.length;
@@ -229,8 +252,8 @@ function updateCartDisplay() {
     cart.forEach(item => {
         const cartItem = document.createElement('div');
         cartItem.className = 'cart-item';
-        cartItem.innerHTML = `
-            <div class="item-image">
+        cartItem.innerHTML = 
+            `<div class="item-image">
                 <img src="${item.productImg}" alt="${item.name}" />
             </div>
             <div class="item-details">
@@ -242,8 +265,7 @@ function updateCartDisplay() {
                     <button class="quantity-btn" data-id="${item.id}" data-action="increase">+</button>
                 </div>
                 <button class="remove-btn" data-id="${item.id}">X</button>
-            </div>
-        `;
+            </div>`;
         cartItemsContainer.appendChild(cartItem);
     });
 
@@ -254,7 +276,8 @@ function updateCartDisplay() {
             const productID = button.getAttribute('data-id');
             const action = button.getAttribute('data-action');
             const quantityChange = action === 'increase' ? 1 : -1;
-            updateQuantity(productID, cart.find(item => item.id === productID).quantity + quantityChange);
+            const currentQuantity = cart.find(item => item.id === productID).quantity;
+            updateQuantity(productID, currentQuantity + quantityChange);
         });
     });
 
@@ -267,27 +290,24 @@ function updateCartDisplay() {
     });
 }
 
+// Function to calculate the total price of items in the cart
 function calculateCartTotal() {
     return cart.reduce((total, item) => total + (item.price * item.quantity), 0).toFixed(2);
 }
-
+// Attach event listener to "Add to Cart" buttons
 document.addEventListener('DOMContentLoaded', () => {
-    const cartBtn = document.querySelector('#cart-btn');
-    const cartContainer = document.querySelector('#cart-container');
-
-    if (cartBtn && cartContainer) {
-        cartBtn.addEventListener('click', () => {
-            console.log('Cart button clicked, active class toggled.');
-            cartContainer.style.display = cartContainer.style.display === 'block' ? 'none' : 'block';
-        });
-    } else {
-        console.error('Cart button or container not found.');
-    }
-
-    displayProducts();
-    displayHousewareProducts();
-    document.querySelector('.box-container').addEventListener('click', addToCart);
+    document.querySelectorAll('.add-to-cart-btn').forEach(button => {
+        button.addEventListener('click', addToCart);
+    });
 });
+// Initialize
+document.addEventListener('DOMContentLoaded', () => {
+    loadCartFromFirebase(); // Load the cart from Firebase on page 
+    displayHousewareProducts();
+    displayProducts();
+});
+
+
 
 
 

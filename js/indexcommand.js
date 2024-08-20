@@ -223,7 +223,7 @@ const dbRefSchoolSupplies = ref(db, "school-supplies");
 const dbRefHouseware = ref(db, "houseware");
 
 // Cart initialization
-let cart = JSON.parse(localStorage.getItem('cart')) || [];
+let cart = [];
 updateCartDisplay();
 
 // Function to shuffle array
@@ -379,7 +379,7 @@ function addToCart(event) {
 // Function to handle removing items from the cart
 function removeFromCart(productID) {
     cart = cart.filter(item => item.id !== productID);
-    
+
     // Save updated cart to Firebase
     saveCartToFirebase();
     updateCartDisplay();
@@ -403,7 +403,17 @@ function updateQuantity(productID, quantity) {
 // Function to save the current cart to Firebase
 function saveCartToFirebase() {
     const cartRef = ref(db, 'cart-items');
-    set(cartRef, cart);
+    const cartObject = cart.reduce((acc, item) => {
+        acc[item.id] = item; // Use product ID as key
+        return acc;
+    }, {});
+    set(cartRef, cartObject)
+        .then(() => {
+            console.log('Cart saved succeszzsfully');
+        })
+        .catch((error) => {
+            console.error('Error saving cart to Firebase:', error);
+        });
 }
 
 // Function to load the cart from Firebase and update the display
@@ -411,9 +421,15 @@ function loadCartFromFirebase() {
     const cartRef = ref(db, 'cart-items');
     onValue(cartRef, (snapshot) => {
         if (snapshot.exists()) {
-            cart = snapshot.val();
+            const cartData = snapshot.val();
+            cart = Object.values(cartData); // Convert object to array
             updateCartDisplay();
+        } else {
+            cart = [];
+            updateCartDisplay(); // Clear display if no data
         }
+    }, (error) => {
+        console.error('Error fetching cart data from Firebase:', error);
     });
 }
 
@@ -459,7 +475,8 @@ function updateCartDisplay() {
             const productID = button.getAttribute('data-id');
             const action = button.getAttribute('data-action');
             const quantityChange = action === 'increase' ? 1 : -1;
-            updateQuantity(productID, cart.find(item => item.id === productID).quantity + quantityChange);
+            const newQuantity = cart.find(item => item.id === productID).quantity + quantityChange;
+            updateQuantity(productID, newQuantity);
         });
     });
 
@@ -483,8 +500,6 @@ document.addEventListener('DOMContentLoaded', () => {
     displayProducts();
     displayHousewareProducts();
 });
-
-
 
 
 

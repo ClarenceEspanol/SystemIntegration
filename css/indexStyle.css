@@ -803,6 +803,157 @@ section{
 
 
 
+/* Modal Background */
+.profile-modal {
+    display: none; /* Hidden by default */
+    position: fixed;
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgba(0, 0, 0, 0.5); /* Black w/ opacity */
+}
+
+/* Profile Modal Content */
+.profile-modal-content {
+    width: 90%;
+    max-width: 800px; /* Wider for profile modal */
+    padding: 1.5rem; /* Increased padding for better spacing */
+    position: fixed;
+    top: 55%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    max-height: 80vh; /* Max height to allow scrolling */
+    overflow-y: auto; /* Enable vertical scroll if content overflows */
+    transition: transform 0.3s ease;
+}
+
+/* Close Button */
+.profile-close-modal {
+    color: #333;
+    font-size: 30px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-left: 10px;
+    margin-top: -10px;
+}
+
+/* Close Button Hover Effect */
+.profile-close-modal:hover,
+.profile-close-modal:focus {
+    color: var(--main-color); /* Change color on hover */
+    text-decoration: none;
+}
+
+/* Modal Header */
+.profile-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 1rem;
+}
+
+/* Modal Heading */
+.profile-modal-header h2 {
+    font-size: 2rem;
+    color: var(--black);
+}
+
+/* Modal Body */
+.profile-modal-body {
+    padding-top: 1rem;
+}
+
+/* Section Titles */
+.profile-modal-body h3 {
+    font-size: 1.8rem;
+    color: var(--black);
+    margin-bottom: 1rem;
+}
+
+/* Profile Icon */
+.profile-icon,
+.icon {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.profile-icon i,
+.icon i {
+    font-size: 1.6rem;
+    color: var(--main-color);
+}
+
+/* Profile Data Display */
+#current-profile-data,
+#current-address-data {
+    font-size: 1.4rem;
+    color: var(--black);
+    background-color: #f9f9f9;
+    padding: 1rem;
+    border-radius: 4px;
+    margin-bottom: 2rem;
+}
+
+/* Form Elements */
+.profile-modal-body form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.profile-modal-body form label {
+    font-size: 1.6rem;
+    color: var(--black);
+}
+
+.profile-modal-body form input,
+.profile-modal-body form textarea {
+    font-size: 1.6rem;
+    padding: 1rem;
+    border: 2px solid black;
+    border-radius: 4px;
+    background: #fff;
+}
+
+.profile-modal-body form textarea {
+    resize: vertical;
+}
+
+/* Form Buttons */
+.profile-modal-body form button {
+    padding: 1rem;
+    font-size: 1.7rem;
+    color: #fff;
+    background: var(--main-color);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.profile-modal-body form button:hover {
+    background: var(--black);
+}
+
+
+
+
+
+
+
+
+
+
+
 
 
 #feedback-display {
