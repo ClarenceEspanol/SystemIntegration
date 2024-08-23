@@ -23,11 +23,11 @@
             <a href="#contact">Contact us</a>
             <a href="#about">About us</a>
             <a href="#feedback">Feedback</a>
-            <!-- This link will be dynamically replaced -->
+            <a href="#" id="track-orders-link">Track Orders</a>
             <a href="#login-modal" id="auth-link">Log In</a>
-    
+        
             <div class="user-menu" style="display: none;">
-                <a href="#"  id="view-profile-btn">View Profile</a>
+                <a href="#" id="view-profile-btn">View Profile</a>
                 <a href="#" id="logout-btn">Log Out</a>
             </div>
         </div>
@@ -46,7 +46,7 @@
             
             <!-- Cart items will be dynamically added here -->
             <div id="cart-items"></div>
-            <a href="" class="btn">Checkout Now</a>
+            <a href="" class="btn" id="checkoutbtn">Checkout Now</a>
         </div>
     </header>
     <main id="main-content">
@@ -202,7 +202,7 @@
         <a href="#about">About us</a>
         <a href="#feedback">Feedback</a>
     </div>
-    <div class="credit">© <span>Clarence Espanol</span> | all rights reserved</div>
+    <div class="credit">© <span>2024</span> | all rights reserved</div>
    </section>
 </div>
 
@@ -264,13 +264,13 @@
                 <h3>Edit Profile Information</h3>
                 <form id="profile-form">
                     <label for="profile-name">Name:</label>
-                    <input type="text" id="profile-name" placeholder="John Doe" />
+                    <input type="text" id="profile-name" placeholder="Juan Dela Cruz" />
                     
                     <label for="profile-bday">Birthday:</label>
                     <input type="date" id="profile-bday" />
                     
                     <label for="profile-email">Email:</label>
-                    <input type="email" id="profile-email" placeholder="john.doe@example.com" />
+                    <input type="email" id="profile-email" placeholder="juandelacruz@example.com" />
                     
                     <button type="button" id="update-profile-btn">Update Profile</button>
                 </form>
@@ -290,28 +290,28 @@
                 <h3>Edit Address Information</h3>
                 <form id="address-form">
                     <label for="contact-name">Contact Name:</label>
-                    <input type="text" id="contact-name" placeholder="John Doe" />
+                    <input type="text" id="contact-name" placeholder="Juan Dela Cruz" />
                     
                     <label for="contact-phone">Phone Number:</label>
                     <input type="tel" id="contact-phone" placeholder="+63934567890" />
                     
                     <label for="address">Address:</label>
-                    <textarea id="address" placeholder="1234 Elm Street, Springfield"></textarea>
+                    <textarea id="address" placeholder="23 Main Street Barangay San Roque "></textarea>
                     
                     <label for="house-number">House Number:</label>
                     <input type="text" id="house-number" placeholder="N/A" />
                     
                     <label for="city">City:</label>
-                    <input type="text" id="city" placeholder="Springfield" />
+                    <input type="text" id="city" placeholder=" Quezon City " />
                     
                     <label for="state">State/Province:</label>
-                    <input type="text" id="state" placeholder="IL" />
+                    <input type="text" id="state" placeholder="Metro Manila" />
                     
                     <label for="region">Region:</label>
-                    <input type="text" id="region" placeholder="Midwest" />
+                    <input type="text" id="region" placeholder="NCR" />
                     
                     <label for="zip">Zip/Postal Code:</label>
-                    <input type="text" id="zip" placeholder="62704" />
+                    <input type="text" id="zip" placeholder="6241" />
                     
                     <button type="button" id="update-address-btn">Update Address</button>
                 </form>
@@ -338,6 +338,60 @@
     </div>
 </div>
 
+
+<!-- Checkout Modal -->
+<div id="checkout-modal" class="checkoutmodal">
+    <div class="checkoutmodal-content">
+        <span class="close-btn">&times;</span>
+        <h2>Checkout</h2>
+        <div class="checkout-info">
+            <div class="user-info">
+                <h3>Personal Information</h3>
+                <p id="user-name">Name: </p>
+                <p id="user-email">Email: </p>
+                <p id="user-address">Address: </p>
+            </div>
+            <div class="cart-summary">
+                <h3>Your Cart</h3>
+                <div id="checkout-items"></div>
+            </div>
+        </div>
+        <div class="total-price">
+            <h3>Total Price: <span id="checkout-total">₱0.00</span></h3>
+        </div>
+        <div class="payment-options">
+            <h3>Payment Options</h3>
+            <select id="payment-method">
+                <option value="" disabled selected>Select Payment Method</option>
+                <option value="Cash on Pick up">Cash on Pick up</option>
+                <option value="Cash on Delivery">Cash on Delivery</option>
+            </select>
+        </div>
+        <button id="confirm-checkout" class="btn">Confirm Checkout</button>
+    </div>
+</div>
+
+<!-- Track Orders Modal -->
+<div id="track-orders-modal" class="track-modal">
+    <div class="track-modal-content">
+        <span class="close-btn">&times;</span>
+        <h2>Your Orders</h2>
+        <button id="view-history-btn" class="view-history-btn">View Order History</button>
+        <div id="orders-list"></div>
+        <div id="total-price-container">
+            <h3>Total Price: <span id="total-price">₱0.00</span></h3>
+        </div>
+    </div>
+</div>
+
+<!-- Order History Modal -->
+<div id="order-history-modal" class="track-modal">
+    <div class="track-modal-content">
+        <span class="close-btn">&times;</span>
+        <h2>Order History</h2>
+        <div id="history-list"></div>
+    </div>
+</div>
 
 <script type="module" src="js/indexcommand.js"></script>
     

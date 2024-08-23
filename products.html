@@ -20,6 +20,7 @@
                 <a href="index.html">Home</a>
                 <a href="#school">School Supplies</a>
                 <a href="#houseware">Houseware</a>
+                <a href="#" id="track-orders-link">Track Orders</a>
             </div>
             <div class="icons">
                 <div class="fas fa-shopping-cart" id="cart-btn">
@@ -33,10 +34,10 @@
                 <!-- Total Price Display -->
                 <div class="cart-total">
                     <div class="price">₱0.00</div>
-                </div>
-                <div id="cart-items"></div>
-                <a href="#" class="btn">Checkout Now</a>
-            </div>
+                <!-- Cart items will be dynamically added here -->
+            <div id="cart-items"></div>
+            <a href="" class="btn" id="checkoutbtn">Checkout Now</a>
+        </div>
         </section>
 
     <!-- school supplies -->
@@ -54,6 +55,63 @@
             <!-- Product boxes will be inserted here dynamically by JavaScript -->
         </div>
     </section>
+
+
+    <!-- Checkout Modal -->
+<div id="checkout-modal" class="checkoutmodal">
+    <div class="checkoutmodal-content">
+        <span class="close-btn">&times;</span>
+        <h2>Checkout</h2>
+        <div class="checkout-info">
+            <div class="user-info">
+                <h3>Personal Information</h3>
+                <p id="user-name">Name: </p>
+                <p id="user-email">Email: </p>
+                <p id="user-address">Address: </p>
+            </div>
+            <div class="cart-summary">
+                <h3>Your Cart</h3>
+                <div id="checkout-items"></div>
+            </div>
+        </div>
+        <div class="total-price">
+            <h3>Total Price: <span id="checkout-total">₱0.00</span></h3>
+        </div>
+        <div class="payment-options">
+            <h3>Payment Options</h3>
+            <select id="payment-method">
+                <option value="" disabled selected>Select Payment Method</option>
+                <option value="Cash on Pick up">Cash on Pick up</option>
+                <option value="Cash on Delivery">Cash on Delivery</option>
+            </select>
+        </div>
+        <button id="confirm-checkout" class="btn">Confirm Checkout</button>
+    </div>
+</div>
+
+<!-- Track Orders Modal -->
+<div id="track-orders-modal" class="track-modal">
+    <div class="track-modal-content">
+        <span class="close-btn">&times;</span>
+        <h2>Your Orders</h2>
+        <button id="view-history-btn" class="view-history-btn">View Order History</button>
+        <div id="orders-list"></div>
+        <div id="total-price-container">
+            <h3>Total Price: <span id="total-price">₱0.00</span></h3>
+        </div>
+    </div>
+</div>
+
+<!-- Order History Modal -->
+<div id="order-history-modal" class="track-modal">
+    <div class="track-modal-content">
+        <span class="close-btn">&times;</span>
+        <h2>Order History</h2>
+        <div id="history-list"></div>
+    </div>
+</div>
+
+
 
     <script type="module" src="js/product.js"></script>
 </body>

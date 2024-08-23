@@ -354,11 +354,6 @@ section{
 .houseware {
     text-align: center;
 }
-.stock{
-    font-size: 1.5rem;
-    color: #fff;
-    text-align: center;
-}
 .houseware .box-container {
     display: flex;
     flex-wrap: wrap;
@@ -429,6 +424,74 @@ section{
     margin-top: 1rem;
 }
 
+
+/* Common styles for both sections */
+.box-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+    position: relative;
+}
+
+.box {
+    text-align: center;
+    border: var(--border);
+    padding: 1.5rem; /* Reduced padding for a more uniform look */
+    width: 30rem; /* Fixed width */
+    height: 40rem; /* Fixed height */
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Ensures space is distributed evenly */
+}
+
+/* Image styling */
+.box .image {
+    flex: 1; /* Takes up remaining space */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem 0; /* Reduced padding */
+}
+
+.box .image img {
+    max-width: 100%;
+    max-height: 15rem; /* Ensures image fits well within box */
+    object-fit: cover; /* Ensures images do not get distorted */
+}
+
+/* Content styling */
+.box .content {
+    flex: 2; /* Ensures content section is more prominent */
+}
+
+.box .content h3 {
+    color: #fff;
+    font-size: 2rem; /* Adjusted font size for consistency */
+}
+
+.box .content .price {
+    color: #fff;
+    font-size: 2rem; /* Adjusted font size for consistency */
+}
+
+.box .content .price span {
+    text-decoration: line-through;
+    font-weight: lighter;
+    font-size: 1.4rem; /* Adjusted font size */
+}
+
+.box .content .stock {
+    font-size: 1.5rem;
+    color: #fff;
+}
+
+.show {
+    text-align: center;
+    margin-top: 1rem;
+}
 
 /* contact design */
 .contact .row {
@@ -946,6 +1009,351 @@ section{
 
 
 
+
+
+/* Checkout Modal Styles */
+.checkoutmodal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1000; /* Sit on top */
+    left: 0;
+    top: 50px;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgba(0, 0, 0, 0.5); /* Slightly darker background */
+}
+
+.checkoutmodal-content {
+    background-color: #ffffff;
+    font-size: 2rem;
+    margin: 5% auto; /* Adjusted for better center alignment */
+    padding: 20px;
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    width: 90%; /* Adjusted width */
+    max-width: 800px; /* Maximum width */
+}
+
+.close-btn {
+    color: #333;
+    float: right;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close-btn:hover,
+.close-btn:focus {
+    color: #000;
+    text-decoration: none;
+}
+
+.checkout-info {
+    display: flex; /* Display user-info and cart-summary in a row */
+    justify-content: space-between; /* Space out the sections */
+    margin-bottom: 20px;
+}
+
+.user-info,
+.cart-summary {
+    width: 48%; /* Adjust width to fit in a row */
+}
+
+.user-info h3,
+.cart-summary h3 {
+    font-size: 2rem;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.user-info p,
+.cart-summary p {
+    font-size: 1.5rem;
+    margin: 5px 0;
+    line-height: 2;
+}
+
+.total-price {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #4CAF50; /* Green color for total price */
+    margin-bottom: 15px; /* Space below the total price */
+}
+
+.payment-options {
+    margin-bottom: 20px;
+}
+
+.payment-options select {
+    width: 100%; /* Full width */
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1); /* Subtle inner shadow */
+}
+
+.cart-summary .item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 10px;
+}
+
+.cart-summary .item img {
+    width: 180px; /* Increased width for images */
+    height: auto; /* Increased height for images */
+    margin-right: 10px;
+    border-radius: 5px; /* Rounded corners */
+}
+
+.cart-summary .item .item-details {
+    flex: 1;
+}
+
+.cart-summary .item .item-name {
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.cart-summary .item .item-price {
+    font-size: 1rem;
+    color: #333;
+}
+
+.btn {
+    background-color: #4CAF50; /* Green */
+    border: none;
+    color: white;
+    padding: 12px 24px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    font-weight: 600;
+    margin: 10px 0;
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer;
+    transition: background-color 0.3s ease; /* Smooth color transition */
+}
+
+.btn:hover {
+    background-color: #45a049;
+}
+
+
+
+
+
+/* Track Orders Modal styles */
+.track-modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 50px;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+.track-modal-content {
+    background-color: #fefefe;
+    margin: 2% auto; /* Reduced margin for a tighter fit */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 90%; /* Adjusted width for better fit */
+    max-width: 800px; /* Set a maximum width for larger screens */
+    max-height: 90vh; /* Limit height and enable scrolling if content is too long */
+    overflow-y: auto; /* Enable vertical scrolling */
+    border-radius: 10px; /* Rounded corners for the modal */
+}
+
+/* Close button styling */
+.close-btn {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close-btn:hover,
+.close-btn:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* View Order History Button */
+.view-history-btn {
+    background-color: #007bff; /* Blue background */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px; /* Font size for the button */
+    margin: 10px 0; /* Margin for spacing */
+    cursor: pointer;
+    border-radius: 5px; /* Rounded corners for the button */
+}
+
+.view-history-btn:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+}
+
+/* Order item styling */
+.order-item {
+    margin-top: 20px;
+    padding: 15px; /* Increased padding for better spacing */
+    margin-bottom: 15px; /* Increased margin for separation */
+    background-color: #f9f9f9; /* Light background for better visibility */
+    border: 1px solid #ddd;
+    border-radius: 5px; /* Rounded corners for order items */
+    display: flex;
+    flex-direction: column;
+    font-size: 16px; /* Set a base font size for consistency */
+}
+
+/* Ensuring consistent layout for item details */
+.order-item-details {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px; /* Consistent margin */
+    border-bottom: 1px solid #ddd; /* Border for separation */
+    padding-bottom: 10px; /* Padding for spacing */
+}
+
+.order-item-image {
+    width: 80px; /* Consistent image width */
+    height: 80px; /* Fixed height to match image width */
+    object-fit: cover; /* Maintain aspect ratio and cover the area */
+    margin-right: 15px; /* Consistent margin */
+    border-radius: 5px; /* Rounded corners for images */
+    border: 1px solid #ddd; /* Border for images */
+}
+
+.order-item-text {
+    flex-grow: 1;
+}
+
+/* Increase font size for <p> tags inside order items */
+.order-item p {
+    font-size: 1.5rem; /* Increased font size for better readability */
+    margin: 5px 0; /* Margin for spacing between lines */
+}
+
+/* Consistent font sizes for different parts of the order item */
+.order-item-name {
+    font-size: 22px; /* Increased font size for name */
+    font-weight: bold;
+    margin-bottom: 5px; /* Margin for spacing between name and price */
+}
+
+.order-item-price {
+    font-size: 20px; /* Increased font size for price */
+    margin-bottom: 10px; /* Margin for spacing between price and status */
+}
+
+.order-summary {
+    margin-top: 10px;
+}
+
+/* Consistent font sizes for Order ID and status */
+.order-id,
+.order-status {
+    font-size: 18px; /* Increased font size for Order ID and status */
+    margin-bottom: 5px;
+}
+
+.cancel-btn {
+    background-color: #f44336; /* Red background */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px; /* Increased font size for the button */
+    margin-top: 10px;
+    cursor: pointer;
+    border-radius: 5px; /* Rounded corners for the button */
+}
+
+.cancel-btn:hover {
+    background-color: #c62828; /* Darker red on hover */
+}
+
+/* Total price container styling */
+#total-price-container {
+    margin-top: 20px;
+}
+
+#total-price {
+    font-size: 20px; /* Increased font size for total price */
+    font-weight: bold;
+}
+
+/* Order History Modal styles */
+#order-history-modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 80px;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+#order-history-modal .track-modal-content {
+    background-color: #fefefe;
+    margin: 2% auto; /* Reduced margin for a tighter fit */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 90%; /* Adjusted width for better fit */
+    max-width: 800px; /* Set a maximum width for larger screens */
+    max-height: 90vh; /* Limit height and enable scrolling if content is too long */
+    overflow-y: auto; /* Enable vertical scrolling */
+    border-radius: 10px; /* Rounded corners for the modal */
+}
+
+/* Reorder Button */
+.reorder-btn {
+    background-color: #28a745; /* Green background for reorder button */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px; /* Font size for the button */
+    margin-top: 10px; /* Margin for spacing */
+    cursor: pointer;
+    border-radius: 5px; /* Rounded corners for the button */
+    transition: background-color 0.3s, box-shadow 0.3s; /* Smooth transition */
+}
+
+.reorder-btn:hover {
+    background-color: #218838; /* Darker green on hover */
+}
+
+/* Optional: Add shadow for a better effect */
+.reorder-btn:focus, .reorder-btn:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+}
+#history-list {
+    margin-top: 20px;
+}
+
+#history-list .order-item {
+    background-color: #f0f0f0; /* Slightly different background for history items */
+}
 
 
 

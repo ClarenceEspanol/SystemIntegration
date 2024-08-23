@@ -3,6 +3,9 @@
     --black: #13131a;
     --bg: #010103;
     --border: .1rem solid rgba(255, 255, 255, .3);
+    --preparing-color: orange; /* Color for preparing orders */
+    --ship-color: blue; /* Color for shipping orders */
+    --complete-color: var(--main-color); /* Use main color for completed orders */
 }
 
 * {
@@ -144,22 +147,6 @@ header {
 .dashboard, .orders, .feedback, .contact, .users {
     padding: 20px;
     margin-top: 80px; /* Adjust based on header height */
-}
-
-.dashboard {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-}
-
-.dashboard-content {
-    background-color: var(--bg);
-    border: var(--border);
-    border-radius: 8px;
-    width: 100%;
-    height: 80vh;
-    padding: 20px;
-    color: #fff;
 }
 
 /* Heading Styles for All Sections */
@@ -389,13 +376,265 @@ header {
 
 
 
+/* Notification Icon */
+.notification-icon {
+    position: relative;
+    cursor: pointer;
+    font-size: 24px;
+}
+
+/* Notification Count Badge */
+.notification-count {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    background-color: red;
+    color: white;
+    border-radius: 50%;
+    padding: 2px 6px;
+    font-size: 12px;
+}
+
+/* Modal Background */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+    padding-top: 60px;
+}
+
+/* Modal Content */
+.modal-content {
+    background-color: #fefefe;
+    margin: 5% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 600px; /* Limit the width to avoid too much horizontal space */
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+/* Close Button */
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* Notifications List */
+#notifications-list {
+    max-height: 400px; /* Limit the height of the notifications list */
+    overflow-y: auto; /* Allow scrolling if notifications exceed the height */
+    margin-top: 20px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    background-color: #f9f9f9;
+    border-radius: 4px;
+}
+
+/* Notification Item */
+.notification-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.notification-item:last-child {
+    margin-bottom: 0;
+    border-bottom: none; /* Remove the border from the last item */
+}
+
+.notification-item img {
+    margin-right: 15px;
+    border-radius: 4px;
+    width: 50px;
+    height: 50px;
+    object-fit: cover; /* Ensure the image is contained within the square */
+}
+
+.notification-item p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.4;
+    color: #333;
+}
 
 
 
 
 
 
+.dashboard {
+    display: flex;
+    flex-direction: column; /* Ensure vertical alignment */
+    align-items: center;
+    justify-content: center; /* Center content vertically */
+    padding: 20px; /* Optional: Add padding to the section */
+}
 
+.dashboard-content {
+    background-color: var(--bg);
+    border: var(--border);
+    border-radius: 8px;
+    width: 100%;
+    height: auto;
+    padding: 20px;
+    color: #fff;
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+    overflow-x: auto; /* Enable horizontal scrolling */
+    white-space: nowrap; /* Prevent line breaks */
+    display: flex; /* Ensure content is displayed in a row */
+    flex-wrap: nowrap; /* Prevent wrapping to the next line */
+}
+#orders-display {
+    background-color: var(--bg);
+    border: var(--border);
+    border-radius: 8px;
+    width: 100%;
+    padding: 20px;
+    color: #fff;
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+    display: grid; /* Use grid layout for items */
+    grid-template-columns: repeat(3, 1fr); /* 3 items per row */
+    gap: 20px; /* Space between items */
+}
+
+.order-item {
+    background-color: #333;
+    border: 1px solid #444;
+    border-radius: 8px;
+    padding: 15px;
+    box-sizing: border-box;
+    color: #fff;
+    margin-left: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Add shadow for better visibility */
+    height: auto; /* Allow height to adjust based on content */
+    overflow: hidden; /* Hide any overflowing content */
+    text-align: left; /* Align text to the left */
+    display: flex; /* Use flexbox for layout */
+    flex-direction: column; /* Stack content vertically */
+}
+
+.order-items {
+    display: flex;
+    flex-direction: column; /* Stack item details vertically */
+    gap: 10px; /* Add gap between items */
+    margin-top: 10px;
+}
+
+.order-item-detail {
+    display: flex;
+    align-items: center; /* Align items to the center */
+    margin-bottom: 10px;
+}
+
+.order-item-detail img {
+    width: 100px; /* Set a fixed width for images */
+    height: auto;
+    margin-right: 10px;
+}
+
+.order-item p {
+    font-size: 1.3rem; /* Adjusted font size for readability */
+    line-height: 1.2; /* Improved readability */
+    margin: 5px 0; /* Reduce margin to minimize white space */
+    overflow: hidden; /* Hide overflowing text */
+    text-overflow: ellipsis; /* Show ellipsis for overflowing text */
+    white-space: nowrap; /* Prevent text wrapping */
+}
+
+.order-actions {
+    display: flex;
+    flex-direction: column; /* Stack buttons vertically */
+    margin-top: 10px;
+    width: 100%; /* Make buttons cover full width */
+}
+
+.confirm-btn, .reject-btn {
+    border: none;
+    border-radius: 5px;
+    padding: 12px; /* Adjusted padding for buttons */
+    margin-top: 10px; /* Space between buttons */
+    width: 100%; /* Full width for each button */
+    cursor: pointer;
+    font-size: 1rem; /* Adjusted font size */
+    transition: background-color 0.3s;
+}
+
+.confirm-btn {
+    background-color: #28a745; /* Green color */
+    color: #fff;
+}
+
+.confirm-btn:hover {
+    background-color: #218838; /* Darker green on hover */
+}
+
+.reject-btn {
+    background-color: #dc3545; /* Red color */
+    color: #fff;
+}
+
+.reject-btn:hover {
+    background-color: #c82333; /* Darker red on hover */
+}
+
+.preparing-btn, .ship-btn, .complete-btn {
+    border: none;
+    border-radius: 5px;
+    padding: 8px 12px;
+    margin-top: 10px;
+    margin-left: 10px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s, transform 0.3s;
+    color: #fff;
+}
+
+.preparing-btn {
+    background-color: var(--preparing-color); /* Orange color for preparing */
+}
+
+.preparing-btn:hover {
+    background-color: darkorange; /* Darker orange on hover */
+}
+
+.ship-btn {
+    background-color: var(--ship-color); /* Blue color for shipping */
+}
+
+.ship-btn:hover {
+    background-color: darkblue; /* Darker blue on hover */
+}
+
+.complete-btn {
+    background-color: var(--complete-color); /* Green color (main color) for completed */
+}
+
+.complete-btn:hover {
+    background-color: darkgreen; /* Darker green on hover */
+}
+
+/* Optional: Add a subtle lift effect on hover */
+.preparing-btn:hover, .ship-btn:hover, .complete-btn:hover {
+    transform: translateY(-2px); /* Slight lift on hover */
+}
 
 
 
