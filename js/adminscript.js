@@ -3,6 +3,9 @@ import { getDatabase, ref, set, get, onValue, remove, update } from "https://www
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-storage.js";
 
+// Show loading indicator
+document.getElementById('loading-indicator').style.display = 'flex';
+
 // Your Firebase configuration
 const firebaseConfig = {
     apiKey: "AIzaSyAmiSdmLGutt2kwljfpUtHRRkBKKFJKHbE",
@@ -20,12 +23,16 @@ const db = getDatabase(app);
 const auth = getAuth(app);
 const storage = getStorage(app);
 
+// Hide loading indicator after initialization
+document.getElementById('loading-indicator').style.display = 'none';
+
 
 
 //orders
 document.addEventListener('DOMContentLoaded', () => {
     const dashboardContent = document.getElementById('dashboard-content');
     const ordersDisplay = document.getElementById('orders-display');
+    const loadingIndicator = document.getElementById('loading-indicator');
 
     // References to Firebase
     const ordersRef = ref(db, 'orders');
@@ -33,16 +40,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const displayOrders = async () => {
         try {
+            loadingIndicator.style.display = 'flex'; // Show loading indicator
             const ordersSnapshot = await get(ordersRef);
             if (ordersSnapshot.exists()) {
                 const orders = ordersSnapshot.val();
                 dashboardContent.innerHTML = '';
                 ordersDisplay.innerHTML = '';
-
+    
                 // Fetch user profiles once
                 const userProfilesSnapshot = await get(userProfilesRef);
                 const userProfiles = userProfilesSnapshot.val();
-
+    
                 if (userProfiles) {
                     // Collect and sort orders
                     let allOrders = [];
@@ -53,16 +61,16 @@ document.addEventListener('DOMContentLoaded', () => {
                             allOrders.push({ ...order, userId, orderId });
                         });
                     });
-
+    
                     // Sort orders by timestamp in descending order
                     allOrders.sort((a, b) => b.timestamp - a.timestamp);
-
+    
                     // Display sorted orders
                     allOrders.forEach(order => {
                         const userProfile = userProfiles[order.userId]?.user_profile || {};
                         const username = userProfiles[order.userId]?.username || 'Unknown';
                         const showPickupButton = order.paymentMethod === 'Cash on Pickup';
-
+    
                         if (order.orderStatus === 'Pending') {
                             dashboardContent.innerHTML += `
                                 <div class="order-item" data-user-id="${order.userId}" data-order-id="${order.orderId}">
@@ -70,6 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                     <p>User Name: ${userProfile.name || 'Anonymous'}</p>
                                     <p>Username: ${username}</p>
                                     <p>Total Price: ₱${order.totalPrice.toFixed(2)}</p>
+                                    <p>Shipping Fee: ₱${order.shippingFee.toFixed(2)}</p>
                                     <p>Payment Method: ${order.paymentMethod}</p>
                                     <p>Status: ${order.orderStatus}</p>
                                     <p>Quantity: ${Object.values(order.items).reduce((total, item) => total + item.quantity, 0)}</p>
@@ -94,6 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                     <p>User Name: ${userProfile.name || 'Anonymous'}</p>
                                     <p>Username: ${username}</p>
                                     <p>Total Price: ₱${order.totalPrice.toFixed(2)}</p>
+                                    <p>Shipping Fee: ₱${order.shippingFee.toFixed(2)}</p>
                                     <p>Payment Method: ${order.paymentMethod}</p>
                                     <p>Status: ${order.orderStatus}</p>
                                     <p>Quantity: ${Object.values(order.items).reduce((total, item) => total + item.quantity, 0)}</p>
@@ -123,6 +133,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } catch (error) {
             console.error('Error fetching data:', error);
+        } finally {
+            loadingIndicator.style.display = 'none'; // Hide loading indicator
         }
     };
 
@@ -140,6 +152,8 @@ const handleButtonClick = async (event) => {
     }
 
     try {
+        loadingIndicator.style.display = 'flex'; // Show loading indicator
+
         if (event.target.classList.contains('confirm-btn')) {
             console.log('Confirm button clicked');
             const orderRef = ref(db, `orders/${userId}/${orderId}`);
@@ -168,20 +182,29 @@ const handleButtonClick = async (event) => {
                     }
                 }));
                 alert('Order confirmed successfully!');
-                displayOrders();
             }
         } else if (event.target.classList.contains('reject-btn')) {
             console.log('Reject button clicked');
             const orderRef = ref(db, `orders/${userId}/${orderId}`);
-            await remove(orderRef);
-            alert('Order rejected successfully!');
-            displayOrders();
+            const orderSnapshot = await get(orderRef);
+
+            if (orderSnapshot.exists()) {
+                const order = orderSnapshot.val();
+                
+                // Add order to 'order-history' with status 'REJECTED'
+                const orderHistoryRef = ref(db, `order-history/${userId}/${orderId}`);
+                await set(orderHistoryRef, { ...order, orderStatus: 'REJECTED' });
+
+                // Remove order from 'orders' node
+                await remove(orderRef);
+                
+                alert('Order rejected successfully and moved to order history!');
+            }
         } else if (event.target.classList.contains('preparing-btn')) {
             console.log('Preparing button clicked');
             const orderRef = ref(db, `orders/${userId}/${orderId}`);
             await update(orderRef, { orderStatus: 'PREPARING' });
             alert('Order status updated to Preparing!');
-            displayOrders();
         } else if (event.target.classList.contains('ship-btn')) {
             console.log('Ship button clicked');
             const orderRef = ref(db, `orders/${userId}/${orderId}`);
@@ -194,14 +217,12 @@ const handleButtonClick = async (event) => {
                     : 'TO SHIP';
                 await update(orderRef, { orderStatus: newStatus });
                 alert(`Order status updated to ${newStatus}!`);
-                displayOrders();
             }
         } else if (event.target.classList.contains('pickup-btn')) {
             console.log('Pickup button clicked');
             const orderRef = ref(db, `orders/${userId}/${orderId}`);
             await update(orderRef, { orderStatus: 'READY FOR PICKUP' });
             alert('Order status updated to Ready for Pickup!');
-            displayOrders();
         } else if (event.target.classList.contains('complete-btn')) {
             console.log('Complete button clicked');
             const orderRef = ref(db, `orders/${userId}/${orderId}`);
@@ -216,11 +237,13 @@ const handleButtonClick = async (event) => {
                 await set(orderHistoryRef, { ...order, orderStatus: 'COMPLETED' });
 
                 alert('Order marked as Completed and moved to order history!');
-                displayOrders();
             }
         }
+        displayOrders();
     } catch (error) {
         console.error('Error updating order:', error);
+    } finally {
+        loadingIndicator.style.display = 'none'; // Hide loading indicator
     }
 };
 
@@ -228,62 +251,69 @@ document.addEventListener('click', handleButtonClick);
 });
 
 
-
-// Function to handle form submission for adding a product
+//add products
 document.getElementById('add-product-form')?.addEventListener('submit', async (e) => {
-        e.preventDefault();
+    e.preventDefault();
 
-        const productName = document.getElementById('product-name').value;
-        const productType = document.getElementById('product-type').value;
-        const price = document.getElementById('price').value;
-        const quantity = document.getElementById('quantity').value;
-        const productImg = document.getElementById('product-img').files[0];
+    const productName = document.getElementById('product-name').value;
+    const productType = document.getElementById('product-type').value;
+    const price = document.getElementById('price').value;
+    const quantity = document.getElementById('quantity').value;
+    const productImg = document.getElementById('product-img').files[0];
+    const weight = document.getElementById('weight').value; // Product weight
+    const weightUnit = document.getElementById('weight-unit').value; // Weight unit (kg or g)
 
-        // Reference to the selected product type node and ID counter
-        const productRef = ref(db, `/${productType}`);
-        const productIdCounterRef = ref(db, `/${productType}_counter`);
+    // Reference to the selected product type node and ID counter
+    const productRef = ref(db, `/${productType}`);
+    const productIdCounterRef = ref(db, `/${productType}_counter`);
+    // Show loading indicator
+    document.getElementById('loading-indicator').style.display = 'flex';
 
-        try {
-            // Get the current product ID
-            const snapshot = await get(productIdCounterRef);
-            let productId = 1; // Start from 1 if no products exist
-            if (snapshot.exists()) {
-                productId = snapshot.val() + 1;
-            }
-
-            let productImgUrl = null;
-            if (productImg) {
-                // Rename the image file based on the product ID
-                const newFileName = `${productId}_${productImg.name}`;
-                // Upload image to Firebase Storage
-                const imgRef = storageRef(storage, `images/${productType}/${newFileName}`);
-                await uploadBytes(imgRef, productImg);
-                productImgUrl = await getDownloadURL(imgRef);
-            }
-
-            // Prepare the new product data
-            const newProduct = {
-                id: productId,
-                name: productName,
-                price: parseFloat(price),
-                quantity: parseInt(quantity),
-                createdAt: new Date().toISOString(),
-                productImg: productImgUrl // Store the image URL here
-            };
-
-            // Save the new product to the database
-            await set(ref(db, `/${productType}/${productId}`), newProduct);
-
-            // Update the product ID counter
-            await set(productIdCounterRef, productId);
-
-            // Clear the form after submission
-            e.target.reset();
-
-            alert('Product added successfully!');
-        } catch (error) {
-            console.error("Error adding product:", error);
+    try {
+        // Get the current product ID
+        const snapshot = await get(productIdCounterRef);
+        let productId = 1; // Start from 1 if no products exist
+        if (snapshot.exists()) {
+            productId = snapshot.val() + 1;
         }
+
+        let productImgUrl = null;
+        if (productImg) {
+            // Rename the image file based on the product ID
+            const newFileName = `${productId}_${productImg.name}`;
+            // Upload image to Firebase Storage
+            const imgRef = storageRef(storage, `images/${productType}/${newFileName}`);
+            await uploadBytes(imgRef, productImg);
+            productImgUrl = await getDownloadURL(imgRef);
+        }
+        
+        // Prepare the new product data
+        const newProduct = {
+            id: productId,
+            name: productName,
+            price: parseFloat(price),
+            quantity: parseInt(quantity),
+            weight: parseFloat(weight), // Weight value
+            weightUnit: weightUnit, // Weight unit (kg or g)
+            createdAt: new Date().toISOString(),
+            productImg: productImgUrl // Store the image URL here
+        };
+        
+        // Save the new product to the database
+        await set(ref(db, `/${productType}/${productId}`), newProduct);
+
+        // Update the product ID counter
+        await set(productIdCounterRef, productId);
+
+        // Clear the form after submission
+        e.target.reset();
+
+        alert('Product added successfully!');
+        // Hide loading indicator after initialization
+        document.getElementById('loading-indicator').style.display = 'none';
+    } catch (error) {
+        console.error("Error adding product:", error);
+    }
 });
 
 
@@ -324,68 +354,67 @@ notificationCount.style.display = "none";
 
 // Function to load products and generate notifications for low stock
 function loadProductsAndNotify() {
-const schoolSuppliesRef = ref(db, '/school-supplies');
-const housewareRef = ref(db, '/houseware');
+    const schoolSuppliesRef = ref(db, '/school-supplies');
+    const housewareRef = ref(db, '/houseware');
 
-let lowStockNotifications = [];
+    let lowStockNotifications = [];
 
-function processProducts(snapshot, productType) {
-if (snapshot.exists()) {
-    const products = snapshot.val();
-    Object.values(products).forEach(product => {
-        if (product.quantity < 10) {
-            lowStockNotifications.push({
-                name: product.name,
-                img: product.productImg,
-                quantity: product.quantity
+    function processProducts(snapshot, productType) {
+        if (snapshot.exists()) {
+            const products = snapshot.val();
+            Object.values(products).forEach(product => {
+                if (product.quantity < 10) {
+                    lowStockNotifications.push({
+                        name: product.name,
+                        img: product.productImg,
+                        quantity: product.quantity
+                    });
+                }
             });
         }
+    }
+
+    onValue(schoolSuppliesRef, (snapshot) => {
+        processProducts(snapshot, 'school-supplies');
     });
-}
-}
 
-onValue(schoolSuppliesRef, (snapshot) => {
-processProducts(snapshot, 'school-supplies');
-});
-
-onValue(housewareRef, (snapshot) => {
-processProducts(snapshot, 'houseware');
-});
-
-// Delay to ensure both school supplies and houseware are processed
-setTimeout(() => {
-const notificationsList = document.getElementById('notifications-list');
-notificationsList.innerHTML = '';
-
-if (lowStockNotifications.length > 0) {
-    lowStockNotifications.forEach(notification => {
-        const notificationItem = document.createElement('div');
-        notificationItem.classList.add('notification-item');
-
-        const img = document.createElement('img');
-        img.src = notification.img;
-        img.alt = `${notification.name} Image`;
-        img.style.width = '50px';
-
-        const text = document.createElement('p');
-        text.textContent = `${notification.name} is low on stock. Only ${notification.quantity} left!`;
-
-        notificationItem.appendChild(img);
-        notificationItem.appendChild(text);
-
-        notificationsList.appendChild(notificationItem);
+    onValue(housewareRef, (snapshot) => {
+        processProducts(snapshot, 'houseware');
     });
-    updateNotificationCount(lowStockNotifications.length);
-} else {
-    notificationsList.innerHTML = '<p>No new notifications.</p>';
-    updateNotificationCount(0);
-}
-}, 1000); // Adjust the delay as needed
+
+    // Delay to ensure both school supplies and houseware are processed
+    setTimeout(() => {
+        const notificationsList = document.getElementById('notifications-list');
+        notificationsList.innerHTML = '';
+
+        if (lowStockNotifications.length > 0) {
+            lowStockNotifications.forEach(notification => {
+                const notificationItem = document.createElement('div');
+                notificationItem.classList.add('notification-item');
+
+                const img = document.createElement('img');
+                img.src = notification.img;
+                img.alt = `${notification.name} Image`;
+                img.style.width = '50px';
+
+                const text = document.createElement('p');
+                text.textContent = `${notification.name} is low on stock. Only ${notification.quantity} left! Please contact the supplier ASAP.`;
+
+                notificationItem.appendChild(img);
+                notificationItem.appendChild(text);
+
+                notificationsList.appendChild(notificationItem);
+            });
+            updateNotificationCount(lowStockNotifications.length);
+        } else {
+            notificationsList.innerHTML = '<p>No new notifications.</p>';
+            updateNotificationCount(0);
+        }
+    }, 1000); // Adjust the delay as needed
 }
 
 // Call the renamed function
 loadProductsAndNotify();
-
 
 
 // Function to load products for updating
@@ -511,6 +540,9 @@ function handleProductItemClick(event) {
                 document.getElementById('update-product-name').value = product.name;
                 document.getElementById('update-price').value = product.price;
                 document.getElementById('update-quantity').value = product.quantity;
+                document.getElementById('update-weight').value = product.weight || ''; // Set weight
+                document.getElementById('update-weight-unit').value = product.weightUnit || 'kg'; // Set weight unit
+                
                 const updateProductImg = document.getElementById('update-product-img');
                 if (product.productImg) {
                     updateProductImg.src = product.productImg;
@@ -533,6 +565,8 @@ document.getElementById('update-product-form')?.addEventListener('submit', async
     const productName = document.getElementById('update-product-name').value;
     const price = document.getElementById('update-price').value;
     const quantity = document.getElementById('update-quantity').value;
+    const weight = document.getElementById('update-weight').value;
+    const weightUnit = document.getElementById('update-weight-unit').value;
     const updateProductImg = document.getElementById('update-product-img').files[0];
 
     try {
@@ -552,6 +586,8 @@ document.getElementById('update-product-form')?.addEventListener('submit', async
             name: productName,
             price: parseFloat(price),
             quantity: parseInt(quantity),
+            weight: parseFloat(weight), // Include weight
+            weightUnit: weightUnit, // Include weight unit
             productImg: productImgUrl // Update the image URL here
         };
 

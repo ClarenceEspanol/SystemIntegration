@@ -89,6 +89,9 @@ function createProductBox(product, type) {
     box.setAttribute('data-price', product.price);
     box.setAttribute('data-id', product.id); // Add ID to box for easy reference
 
+    // Check if the stock is less than 5
+    const isOutOfStock = product.quantity < 5;
+
     // Populate the box with content
     box.innerHTML = 
         `<div class="image">
@@ -101,16 +104,21 @@ function createProductBox(product, type) {
                 <span>Stock:</span>
                 <span class="stock-quantity">${product.quantity}</span>
             </div>
-            <a href="#" class="btn add-to-cart-btn" data-id="${product.id}" data-type="${type}">Add to Cart</a>
+            ${isOutOfStock 
+                ? '<a href="#" class="btn out-of-stock-btn" disabled>Out of Stock</a>' 
+                : `<a href="#" class="btn add-to-cart-btn" data-id="${product.id}" data-type="${type}">Add to Cart</a>`
+            }
         </div>`;
 
     // Add event listener to handle add-to-cart action
-    box.querySelector('.add-to-cart-btn').addEventListener('click', (event) => {
-        event.preventDefault(); // Prevent default anchor behavior
-        
-        // Call the addToCart function
-        addToCart(event);
-    });
+    if (!isOutOfStock) {
+        box.querySelector('.add-to-cart-btn').addEventListener('click', (event) => {
+            event.preventDefault(); // Prevent default anchor behavior
+            
+            // Call the addToCart function
+            addToCart(event);
+        });
+    }
 
     return box;
 }
@@ -330,11 +338,11 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('Please select a payment method.');
             return;
         }
-    
+
         const user = auth.currentUser;
         if (user) {
             const userId = user.uid;
-    
+
             // Generate the order ID
             const currentDate = new Date();
             const day = String(currentDate.getDate()).padStart(2, '0');
@@ -367,13 +375,24 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (snapshot.exists()) {
                         const cartItems = snapshot.val();
                         const totalPrice = Object.values(cartItems).reduce((acc, item) => acc + item.price * item.quantity, 0);
-    
+                        
+                        // Determine user region
+                        const userRegion = await getUserRegion(userId);
+
+                        // Calculate shipping fee
+                        const shippingFee = calculateShippingFee(cartItems, userRegion, paymentMethod);
+                        if (paymentMethod === 'Cash on Pick up') {
+                            shippingFee = 0;
+                        }
+
                         // Create order object with status, product types, and timestamp
                         const orderData = {
                             orderId: orderId,
                             userId: userId,
                             paymentMethod: paymentMethod,
                             totalPrice: totalPrice,
+                            shippingFee: shippingFee,
+                            totalAmount: totalPrice + shippingFee,
                             items: Object.keys(cartItems).map(key => ({
                                 ...cartItems[key],
                                 productType: cartItems[key].type // Include product type
@@ -392,6 +411,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             modal.style.display = 'none';
                             document.getElementById('checkout-items').innerHTML = '<p>No items in cart.</p>';
                             document.getElementById('checkout-total').textContent = '₱0.00';
+                            document.getElementById('shipping-fee').textContent = '₱0.00';
                             // Reload the page
                             location.reload();
                         } catch (error) {
@@ -408,89 +428,237 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('You must be logged in to complete the checkout.');
         }
     });
+    async function getUserRegion(userId) {
+        const userAddressRef = ref(db, `users/${userId}/user_address`);
+        try {
+            const snapshot = await get(userAddressRef);
+            const userAddress = snapshot.val();
+            
+            // Log the entire user_address object for debugging
+            console.log('Retrieved User Address:', userAddress);
+            
+            if (userAddress && userAddress.region) {
+                const region = userAddress.region.toLowerCase().trim();
+                console.log('Processed Region:', region);
+                return region;
+            } else {
+                console.warn('Region is null or undefined, defaulting to "island"');
+                return 'island';
+            }
+        } catch (error) {
+            console.error('Error retrieving user address:', error);
+            return 'island';
+        }
+    }
     
+    
+    // Function to calculate shipping fee
+    function calculateShippingFee(cartItems, region, paymentMethod) {
+        // Ensure paymentMethod is defined and is a string
+        paymentMethod = paymentMethod || '';
+    
+        // Initialize shipping fee
+        let shippingFee = 0;
+    
+        // Check payment method
+        if (paymentMethod.toLowerCase() === 'cash on pick up') {
+            // No shipping fee for 'cash on pick up'
+            return shippingFee;
+        }
+    
+        // Handle invalid or missing region
+        if (!region) {
+            console.error('Invalid region provided');
+            return shippingFee;
+        }
+    
+        // Calculate the total weight in grams
+        let totalWeightInGrams = Object.keys(cartItems).reduce((acc, key) => {
+            const item = cartItems[key];
+            const weight = item.weight; // Weight from /cart-items/{id}/weight
+            const weightUnit = item.weightUnit.toLowerCase(); // Weight unit from /cart-items/{id}/weightUnit
+    
+            // Ensure the weight is in grams
+            let weightInGrams = weight;
+            if (weightUnit === 'kg') {
+                weightInGrams = weight * 1000; // Convert kilograms to grams
+            }
+    
+            // Add the weight of the item multiplied by its quantity
+            return acc + (weightInGrams * item.quantity);
+        }, 0);
+    
+        // Convert total weight to kilograms for fee calculation
+        let totalWeightInKg = totalWeightInGrams / 1000;
+    
+        // Calculate shipping fee based on region
+        switch(region.toLowerCase().trim()) {
+            case 'south-luzon':
+            case 'north-luzon':
+                shippingFee = totalWeightInKg <= 0.5 ? 85 : totalWeightInKg <= 1 ? 155 : totalWeightInKg <= 3 ? 180 : totalWeightInKg <= 4 ? 270 : totalWeightInKg <= 5 ? 360 : 455;
+                break;
+            case 'metro-manila':
+                shippingFee = totalWeightInKg <= 0.5 ? 95 : totalWeightInKg <= 1 ? 165 : totalWeightInKg <= 3 ? 190 : totalWeightInKg <= 4 ? 280 : totalWeightInKg <= 5 ? 370 : 465;
+                break;
+            case 'visayas':
+                shippingFee = totalWeightInKg <= 0.5 ? 100 : totalWeightInKg <= 1 ? 180 : totalWeightInKg <= 3 ? 200 : totalWeightInKg <= 4 ? 300 : totalWeightInKg <= 5 ? 400 : 500;
+                break;
+            case 'mindanao':
+                shippingFee = totalWeightInKg <= 0.5 ? 105 : totalWeightInKg <= 1 ? 195 : totalWeightInKg <= 3 ? 220 : totalWeightInKg <= 4 ? 330 : totalWeightInKg <= 5 ? 440 : 550;
+                break;
+            default: // 'island'
+                shippingFee = totalWeightInKg <= 0.5 ? 115 : totalWeightInKg <= 1 ? 205 : totalWeightInKg <= 3 ? 230 : totalWeightInKg <= 4 ? 340 : totalWeightInKg <= 5 ? 450 : 560;
+                break;
+        }
+    
+        return shippingFee;
+    }
+    
+    // Function to update shipping fee display
+    async function updateShippingFee() {
+        const paymentMethod = document.getElementById('payment-method').value;
+        const cartItems = {}; // Retrieve your cart items here
+    
+        try {
+            // Get the current user from Firebase Authentication
+            const user = auth.currentUser;
+            if (!user) {
+                console.error('No user is logged in');
+                document.getElementById('shipping-fee').innerText = '₱0.00';
+                return;
+            }
+    
+            const userId = user.uid; // Get the user ID
+            const region = await getUserRegion(userId);
+    
+            if (!region) {
+                console.warn('Region is null or undefined, defaulting to "island"');
+            }
+    
+            const shippingFee = calculateShippingFee(cartItems, region, paymentMethod);
+    
+            // Check payment method and adjust the shipping fee text
+            let shippingFeeText = `₱${shippingFee.toFixed(2)}`;
+            if (paymentMethod !== 'cash-on-pickup') {
+                shippingFeeText += ' <span class="shipping-provider">shipped by J&T Express</span>';
+            }
+            
+            document.getElementById('shipping-fee').innerHTML = shippingFeeText;
+    
+        } catch (error) {
+            console.error('Error updating shipping fee:', error);
+            document.getElementById('shipping-fee').innerText = '₱0.00';
+        }
+    }
+    // Event listener for payment method change
+    document.getElementById('payment-method').addEventListener('change', updateShippingFee);
+    
+    // Event listener for confirm checkout button
+    document.getElementById('confirm-checkout').addEventListener('click', updateShippingFee);
+    
+    // Initialize shipping fee display to 0 on page load
+    document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('shipping-fee').innerText = '₱0.00';
+    });
 
     function populateCheckoutModal() {
         const user = auth.currentUser;
         if (user) {
             const userId = user.uid;
-
-            // Fetch user profile information from Firebase 'users/{userId}/user_profile' node
-            const userProfileRef = ref(db, 'users/' + userId + '/user_profile');
-            onValue(userProfileRef, (snapshot) => {
-                const userProfile = snapshot.val();
-                if (userProfile) {
-                    document.getElementById('user-name').textContent = 'Name: ' + (userProfile.name || 'N/A');
-                    document.getElementById('user-email').textContent = 'Email: ' + (userProfile.email || 'N/A');
-                } else {
-                    document.getElementById('user-name').textContent = 'Name: N/A';
-                    document.getElementById('user-email').textContent = 'Email: N/A';
-                }
-            });
-
-            // Fetch user address from Firebase 'users/{userId}/user_address' node
-            const userAddressRef = ref(db, 'users/' + userId + '/user_address');
+    
+            // Fetch user profile information from Firebase 'users/{userId}/user_address' node
+            const userAddressRef = ref(db, `users/${userId}/user_address`);
             onValue(userAddressRef, (snapshot) => {
                 const userAddress = snapshot.val();
+                const userNameElem = document.getElementById('user-name');
+                const userEmailElem = document.getElementById('user-email');
+                const userPhoneElem = document.getElementById('user-phone');
+                const userAddressElem = document.getElementById('user-address');
+                
                 if (userAddress) {
-                    document.getElementById('user-address').innerHTML = `
+                    if (userNameElem) userNameElem.textContent = `Name: ${userAddress.contactName || 'N/A'}`;
+                    if (userEmailElem) userEmailElem.textContent = `Email: ${user.email || 'N/A'}`;
+                    if (userPhoneElem) userPhoneElem.textContent = `Phone: ${userAddress.phoneNumber || 'N/A'}`;
+                    if (userAddressElem) userAddressElem.innerHTML = `
                         <p><strong>Address:</strong> ${userAddress.address || 'N/A'}</p>
                         <p><strong>City:</strong> ${userAddress.city || 'N/A'}</p>
-                        <p><strong>Phone Number:</strong> ${userAddress.phone || 'N/A'}</p>
                         <p><strong>Region:</strong> ${userAddress.region || 'N/A'}</p>
-                        <p><strong>State/Province:</strong> ${userAddress.state || 'N/A'}</p>
-                        <p><strong>Zip/Postal Code:</strong> ${userAddress.zip || 'N/A'}</p>
+                        <p><strong>State:</strong> ${userAddress.state || 'N/A'}</p>
+                        <p><strong>Zip Code:</strong> ${userAddress.zip || 'N/A'}</p>
                     `;
                 } else {
-                    document.getElementById('user-address').innerHTML = `
-                        <p><strong>Address:</strong> N/A</p>
-                        <p><strong>City:</strong> N/A</p>
-                        <p><strong>Phone Number:</strong> N/A</p>
-                        <p><strong>Region:</strong> N/A</p>
-                        <p><strong>State/Province:</strong> N/A</p>
-                        <p><strong>Zip/Postal Code:</strong> N/A</p>
-                    `;
+                    if (userNameElem) userNameElem.textContent = 'Name: N/A';
+                    if (userEmailElem) userEmailElem.textContent = 'Email: N/A';
+                    if (userPhoneElem) userPhoneElem.textContent = 'Phone: N/A';
+                    if (userAddressElem) userAddressElem.innerHTML = '<p>No address information available.</p>';
                 }
             });
-
+    
+            // Fetch cart items and calculate total price
+            const cartItemsRef = ref(db, 'cart-items');
+            onValue(cartItemsRef, (snapshot) => {
+                const checkoutItemsContainer = document.getElementById('checkout-items');
+                const checkoutTotalElem = document.getElementById('checkout-total');
+                const shippingFeeElem = document.getElementById('shipping-fee');
+                const paymentMethodElem = document.getElementById('payment-method');
+                
+                if (checkoutItemsContainer && checkoutTotalElem && shippingFeeElem && paymentMethodElem) {
+                    if (snapshot.exists()) {
+                        const cartItems = snapshot.val();
+                        let totalPrice = 0;
+    
+                        checkoutItemsContainer.innerHTML = ''; // Clear previous items
+    
+                        Object.keys(cartItems).forEach(key => {
+                            const item = cartItems[key];
+                            const imageUrl = item.productImg || 'default-image-url'; // Use a default image if URL is not available
+                            
+                            const itemElem = document.createElement('div');
+                            itemElem.classList.add('checkout-item');
+                            itemElem.innerHTML = `
+                                <img src="${imageUrl}" alt="${item.name}" class="item-image">
+                                <p><strong>Product:</strong> ${item.name} (x${item.quantity}) - ₱${(item.price * item.quantity).toFixed(2)}</p>
+                            `;
+                            checkoutItemsContainer.appendChild(itemElem);
+    
+                            totalPrice += item.price * item.quantity;
+                        });
+    
+                        checkoutTotalElem.textContent = `₱${totalPrice.toFixed(2)}`;
+    
+                        // Function to update total price based on shipping fee and payment method
+                        const updateTotalPrice = () => {
+                            const shippingFeeText = shippingFeeElem.textContent;
+                            const shippingFee = parseFloat(shippingFeeText.replace(/[^\d.-]/g, '')) || 0;
+                            const isCashOnPickup = paymentMethodElem.value === 'cash-on-pickup';
+                            const finalTotalPrice = isCashOnPickup ? 0 : totalPrice + shippingFee;
+                            checkoutTotalElem.textContent = `₱${finalTotalPrice.toFixed(2)}`;
+                        };
+    
+                        // Fetch user region and calculate shipping fee
+                        getUserRegion(userId).then(userRegion => {
+                            const shippingFee = calculateShippingFee(cartItems, userRegion);
+                            shippingFeeElem.innerHTML = `₱${shippingFee.toFixed(2)} <span class="shipping-provider">shipped by J&T Express</span>`;
+                            updateTotalPrice(); // Update total price with initial shipping fee
+                        });
+    
+                        // Use MutationObserver to listen for changes in the shipping fee element
+                        const observer = new MutationObserver(updateTotalPrice);
+                        observer.observe(shippingFeeElem, { childList: true, subtree: true });
+    
+                        // Listen for changes to the payment method
+                        paymentMethodElem.addEventListener('change', updateTotalPrice);
+    
+                    } else {
+                        checkoutItemsContainer.innerHTML = '<p>No items in cart.</p>';
+                        checkoutTotalElem.textContent = '₱0.00';
+                        shippingFeeElem.textContent = '₱0.00';
+                    }
+                }
+            });
         } else {
-            document.getElementById('user-name').textContent = 'Name: Guest';
-            document.getElementById('user-email').textContent = 'Email: N/A';
-            document.getElementById('user-address').innerHTML = `
-                <p><strong>Address:</strong> N/A</p>
-                <p><strong>City:</strong> N/A</p>
-                <p><strong>Phone Number:</strong> N/A</p>
-                <p><strong>Region:</strong> N/A</p>
-                <p><strong>State/Province:</strong> N/A</p>
-                <p><strong>Zip/Postal Code:</strong> N/A</p>
-            `;
+            alert('You must be logged in to checkout.');
         }
-
-        // Fetch cart items from Firebase
-        const cartItemsRef = ref(db, 'cart-items');
-        onValue(cartItemsRef, (snapshot) => {
-            if (snapshot.exists()) {
-                const cartItems = snapshot.val();
-                const cartItemsContainer = document.getElementById('checkout-items');
-                let totalPrice = 0;
-
-                cartItemsContainer.innerHTML = '';
-                Object.values(cartItems).forEach(item => {
-                    cartItemsContainer.innerHTML += `
-                        <div class="checkout-item">
-                            <img src="${item.productImg}" alt="${item.name}" style="width: 100px; height: auto;" />
-                            <p>${item.name} - ₱${item.price.toFixed(2)} (${item.type})</p>
-                        </div>
-                    `;
-                    totalPrice += item.price * item.quantity;
-                });
-
-                document.getElementById('checkout-total').textContent = `₱${totalPrice.toFixed(2)}`;
-            } else {
-                document.getElementById('checkout-items').innerHTML = '<p>No items in cart.</p>';
-                document.getElementById('checkout-total').textContent = '₱0.00';
-            }
-        });
     }
 });
 

@@ -302,13 +302,21 @@
                     <input type="text" id="house-number" placeholder="N/A" />
                     
                     <label for="city">City:</label>
-                    <input type="text" id="city" placeholder=" Quezon City " />
+                    <input type="text" id="city" placeholder="Quezon City" />
                     
                     <label for="state">State/Province:</label>
                     <input type="text" id="state" placeholder="Metro Manila" />
                     
                     <label for="region">Region:</label>
-                    <input type="text" id="region" placeholder="NCR" />
+                    <select id="region" required>
+                        <option value="" disabled selected>Select Region</option>
+                        <option value="metro-manila">Metro Manila</option>
+                        <option value="mindanao">Mindanao</option>
+                        <option value="north-luzon">North Luzon</option>
+                        <option value="south-luzon">South Luzon</option>
+                        <option value="visayas">Visayas</option>
+                        <option value="island">Island</option>
+                    </select>
                     
                     <label for="zip">Zip/Postal Code:</label>
                     <input type="text" id="zip" placeholder="6241" />
@@ -339,8 +347,8 @@
 </div>
 
 
-<!-- Checkout Modal -->
-<div id="checkout-modal" class="checkoutmodal">
+ <!-- Checkout Modal -->
+ <div id="checkout-modal" class="checkoutmodal">
     <div class="checkoutmodal-content">
         <span class="close-btn">&times;</span>
         <h2>Checkout</h2>
@@ -357,6 +365,7 @@
             </div>
         </div>
         <div class="total-price">
+            <h3>Shipping Fee: <span id="shipping-fee">₱0.00</span></h3>
             <h3>Total Price: <span id="checkout-total">₱0.00</span></h3>
         </div>
         <div class="payment-options">
@@ -369,6 +378,7 @@
         </div>
         <button id="confirm-checkout" class="btn">Confirm Checkout</button>
     </div>
+</div>
 </div>
 
 <!-- Track Orders Modal -->

@@ -980,7 +980,8 @@ section{
 }
 
 .profile-modal-body form input,
-.profile-modal-body form textarea {
+.profile-modal-body form textarea,
+.profile-modal-body form select {
     font-size: 1.6rem;
     padding: 1rem;
     border: 2px solid black;
@@ -990,6 +991,12 @@ section{
 
 .profile-modal-body form textarea {
     resize: vertical;
+}
+
+/* Dropdown Specific Styles */
+.profile-modal-body form select {
+    background-color: #fff; /* Ensure dropdown background is white */
+    cursor: pointer; /* Pointer cursor for dropdown */
 }
 
 /* Form Buttons */
@@ -1009,7 +1016,20 @@ section{
 
 
 
+.shipping-provider {
+    font-size: 14px; /* Adjust the font size as needed */
+    color: #D71920;  /* J&T Express red color */
+    font-weight: bold; /* Make it bold */
+    margin-left: 5px; /* Add some spacing from the fee amount */
+    text-transform: uppercase; /* Uppercase for the company name */
+    font-family: 'Arial', sans-serif; /* Use a clean, sans-serif font similar to J&T's branding */
+    letter-spacing: 0.5px; /* Slightly increase letter spacing for a crisp look */
+}
 
+.checkout-item .item-image {
+    width: 100px;
+    height: auto;
+}
 
 /* Checkout Modal Styles */
 .checkoutmodal {
@@ -1144,7 +1164,17 @@ section{
 }
 
 
+/* Styling for "Out of Stock" button */
+.out-of-stock-btn {
+    background-color: #6c757d;
+    border-color: #6c757d;
+    cursor: not-allowed;
+}
 
+.out-of-stock-btn:hover {
+    background-color: #5a6268;
+    border-color: #545b62;
+}
 
 
 /* Track Orders Modal styles */
