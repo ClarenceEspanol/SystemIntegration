@@ -544,11 +544,11 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('Please select a payment method.');
             return;
         }
-
+    
         const user = auth.currentUser;
         if (user) {
             const userId = user.uid;
-
+    
             // Generate the order ID
             const currentDate = new Date();
             const day = String(currentDate.getDate()).padStart(2, '0');
@@ -584,13 +584,13 @@ document.addEventListener('DOMContentLoaded', () => {
                         
                         // Determine user region
                         const userRegion = await getUserRegion(userId);
-
+    
                         // Calculate shipping fee
-                        const shippingFee = calculateShippingFee(cartItems, userRegion, paymentMethod);
+                        let shippingFee = calculateShippingFee(cartItems, userRegion, paymentMethod);
                         if (paymentMethod === 'Cash on Pick up') {
-                            shippingFee = 0;
+                            shippingFee = 0; // Corrected: Using let allows reassignment
                         }
-
+    
                         // Create order object with status, product types, and timestamp
                         const orderData = {
                             orderId: orderId,
@@ -925,77 +925,56 @@ document.addEventListener('DOMContentLoaded', () => {
                     const orders = snapshot.val();
                     ordersList.innerHTML = ''; // Clear existing content
     
-                    Object.entries(orders).forEach(([orderKey, order]) => {
-                        const orderItem = document.createElement('div');
-                        orderItem.className = 'order-item';
-                        
-                        let orderTotal = 0;
+                    const orderKeys = Object.keys(orders);
     
-                        Object.entries(order.items).forEach(([itemKey, item]) => {
-                            const itemTotal = item.price * item.quantity;
-                            orderTotal += itemTotal; // Calculate total for this order
-                            cumulativeTotalPrice += itemTotal; // Add to cumulative total
+                    if (orderKeys.length > 0) {
+                        // Create an array of promises to fetch totalAmount from each order node
+                        const totalAmountPromises = orderKeys.map(orderKey => {
+                            const totalAmountRef = ref(db, `orders/${userId}/${orderKey}/totalAmount`);
+                            return get(totalAmountRef).then((totalAmountSnapshot) => {
+                                if (totalAmountSnapshot.exists()) {
+                                    const totalAmount = totalAmountSnapshot.val();
+                                    cumulativeTotalPrice += totalAmount; // Sum up the total amounts
     
-                            orderItem.innerHTML += `
-                                <div class="order-item-details">
-                                    <img src="${item.productImg}" alt="${item.name}" style="width: 80px; height: auto;" />
-                                    <p>${item.name} - ₱${item.price.toFixed(2)} x ${item.quantity}</p>
-                                </div>
-                            `;
-                        });
+                                    // Display order details
+                                    const order = orders[orderKey];
+                                    const orderItem = document.createElement('div');
+                                    orderItem.className = 'order-item';
     
-                        orderItem.innerHTML += `
-                            <p><strong>Order ID:</strong> ${order.orderId}</p>
-                            <p><strong>Total Price:</strong> ₱${orderTotal.toFixed(2)}</p>
-                            <p><strong>Status:</strong> ${order.orderStatus}</p>
-                            <p><strong>Payment Method:</strong> ${order.paymentMethod}</p>
-                            <button class="cancel-btn" data-order-id="${orderKey}">Cancel Order</button>
-                        `;
-                        ordersList.appendChild(orderItem);
-                    });
+                                    let orderDetails = '';
+                                    Object.entries(order.items).forEach(([itemKey, item]) => {
+                                        orderDetails += `
+                                            <div class="order-item-details">
+                                                <img src="${item.productImg}" alt="${item.name}" style="width: 80px; height: auto;" />
+                                                <p>${item.name} - ₱${item.price.toFixed(2)} x ${item.quantity}</p>
+                                            </div>
+                                        `;
+                                    });
     
-                    // Update the total price container with the cumulative total price
-                    totalPriceElement.textContent = `₱${cumulativeTotalPrice.toFixed(2)}`;
-    
-                    // Add event listener for cancel buttons
-                    document.querySelectorAll('.cancel-btn').forEach(btn => {
-                        btn.addEventListener('click', async (event) => {
-                            const orderKey = event.target.getAttribute('data-order-id');
-                            console.log('Attempting to cancel order ID:', orderKey);
-    
-                            const orderRef = ref(db, `orders/${userId}/${orderKey}`);
-                            const historyRef = ref(db, `order-history/${userId}/${orderKey}`);
-    
-                            try {
-                                const orderSnapshot = await get(orderRef);
-                                if (orderSnapshot.exists()) {
-                                    const orderData = orderSnapshot.val();
-                                    const status = orderData.orderStatus;
-    
-                                    console.log('Order data retrieved:', orderData);
-    
-                                    if (status === 'Pending') {
-                                        await set(historyRef, {
-                                            ...orderData,
-                                            orderStatus: 'Canceled',
-                                            canceledDate: new Date().toISOString()
-                                        });
-                                        await remove(orderRef);
-                                        alert('Order canceled successfully.');
-                                        populateOrdersModal(); // Refresh the orders list
-                                        populateOrderHistoryModal(); // Refresh the order history list
-                                    } else {
-                                        alert('Order cannot be canceled. Only orders with "Pending" status can be canceled.');
-                                    }
-                                } else {
-                                    console.error('Order does not exist in database:', orderKey);
-                                    alert('Order does not exist.');
+                                    orderItem.innerHTML = `
+                                        ${orderDetails}
+                                        <p><strong>Order ID:</strong> ${order.orderId}</p>
+                                        <p><strong>Total Price:</strong> ₱${totalAmount.toFixed(2)}</p>
+                                        <p><strong>Status:</strong> ${order.orderStatus}</p>
+                                        <p><strong>Payment Method:</strong> ${order.paymentMethod}</p>
+                                        <button class="cancel-btn" data-order-id="${orderKey}">Cancel Order</button>
+                                    `;
+                                    ordersList.appendChild(orderItem);
                                 }
-                            } catch (error) {
-                                console.error('Error retrieving or removing order:', error);
-                            }
+                            }).catch((error) => {
+                                console.error('Error fetching total amount:', error);
+                            });
                         });
-                    });
+    
+                        // Wait for all promises to resolve
+                        Promise.all(totalAmountPromises).then(() => {
+                            // Update the total price container with the cumulative total price
+                            totalPriceElement.textContent = `₱${cumulativeTotalPrice.toFixed(2)}`;
+                        });
+                    } else {
+                        ordersList.innerHTML = '<p>No orders found.</p>';
+                        totalPriceElement.textContent = '₱0.00'; // Set total price to ₱0.00 when no orders exist
+                    }
                 } else {
                     ordersList.innerHTML = '<p>No orders found.</p>';
                     totalPriceElement.textContent = '₱0.00'; // Set total price to ₱0.00 when no orders exist
@@ -1006,7 +985,6 @@ document.addEventListener('DOMContentLoaded', () => {
             totalPriceElement.textContent = '₱0.00'; // Set total price to ₱0.00 for logged out users
         }
     }
-
     async function populateOrderHistoryModal() {
         const user = auth.currentUser;
         
