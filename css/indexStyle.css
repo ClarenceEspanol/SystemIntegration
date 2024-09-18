@@ -1432,8 +1432,8 @@ section{
 
 
 
+/* Media Queries */
 @media (max-width: 991px) {
-
     /* Ensure the menu button is visible on screens 991px or less */
     #menu-btn {
         display: inline-block;
@@ -1446,7 +1446,7 @@ section{
         top: 100%; /* Position below the header */
         right: 0; /* Align with the right edge */
         background: #fff;
-        width: 40%; /* Set a fixed width for the navbar */
+        width: 80%; /* Adjusted width for better fit */
         max-width: 400px; /* Optional: Set a max-width for the navbar */
         height: calc(100vh - 9.5rem); /* Adjust height */
         display: flex;
@@ -1470,14 +1470,16 @@ section{
         padding: 0.5rem 1rem; /* Padding for better touchability */
         text-align: center; /* Center-align text */
     }
+
     /* Adjustments for screens smaller than 768px */
     .modal-content {
-        max-width: 350px;
-        width: 80%;
+        max-width: 90%; /* Adjust width to fit screen */
+        width: auto;
         padding: 1rem;
         border-radius: 5px;
         top: 50%;
-        left: 30%;
+        left: 50%;
+        transform: translate(-50%, -50%); /* Center modal */
     }
 
     #feedback-display {
@@ -1491,10 +1493,48 @@ section{
     #feedback-display .feedback-item .message {
         font-size: 1.6rem; /* Adjust message size on smaller screens */
     }
+
+    .add-to-cart-btn {
+        width: 100%; /* Button takes full width of container */
+        box-sizing: border-box; /* Ensure padding is included in width */
+    }
+
+    /* Make the product boxes scrollable */
+    .product-container {
+        display: flex;
+        overflow-x: auto; /* Enable horizontal scrolling */
+        -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+        padding: 1rem; /* Add padding for better appearance */
+        gap: 1rem; /* Add gap between product boxes */
+    }
+
+    .product-box {
+        flex: 0 0 auto; /* Prevent shrinking and ensure the width is as per the content */
+        width: 90%; /* Adjust width to fit the container */
+        box-sizing: border-box; /* Ensure padding is included in width */
+    }
+
+    .product-combined {
+        display: flex; /* Arrange the combined boxes horizontally */
+        flex-wrap: nowrap; /* Prevent wrapping */
+        gap: 1rem; /* Space between the two product boxes */
+    }
+
+    .product-item {
+        flex: 1; /* Allow items to grow equally */
+        box-sizing: border-box; /* Ensure padding is included in width */
+    }
+
+    .box .content h3 {
+        color: #fff;
+        font-size: 0.5rem;
+        white-space: nowrap; /* Prevent text from breaking into multiple lines */
+        overflow: hidden; /* Hide overflow text */
+        text-overflow: ellipsis; /* Add ellipsis to overflowing text */
+    }
 }
 
 @media (max-width: 768px) {
-
     /* Adjustments for screens smaller than 768px */
     html {
         font-size: 55%; /* Adjust font size for smaller screens */
@@ -1522,14 +1562,14 @@ section{
         font-size: 1rem;
     }
 
-    /* Adjustments for screens smaller than 768px */
     .modal-content {
-        max-width: 300px;
-        width: 100%;
+        max-width: 90%; /* Adjust width to fit screen */
+        width: auto;
         padding: 1rem;
         border-radius: 5px;
         top: 50%;
-        left: 25%;
+        left: 50%;
+        transform: translate(-50%, -50%); /* Center modal */
     }
 
     .modal-content h2 {
@@ -1549,23 +1589,39 @@ section{
         font-size: 1.4rem;
         margin-top: 1rem; /* Add space above the button */
     }
+
+    .box {
+        padding: 1rem; /* Reduce padding on smaller screens */
+    }
+
+    .add-to-cart-btn {
+        padding: 0.6rem 1rem; /* Adjust padding for smaller screens */
+        font-size: 1.2rem; /* Adjust font size */
+    }
+
+    .box .content h3 {
+        color: #fff;
+        font-size: 0.5rem;
+        white-space: nowrap; /* Prevent text from breaking into multiple lines */
+        overflow: hidden; /* Hide overflow text */
+        text-overflow: ellipsis; /* Add ellipsis to overflowing text */
+    }
 }
 
 @media (max-width: 450px) {
-
     /* Adjustments for screens smaller than 450px */
     html {
         font-size: 50%;
     }
 
-    /* Adjustments for screens smaller than 450px */
     .modal-content {
-        max-width: 200px;
-        width: 50%;
+        max-width: 90%; /* Adjust width to fit screen */
+        width: auto;
         padding: 0.5rem;
         border-radius: 5px;
         top: 50%;
-        left: 30%;
+        left: 50%;
+        transform: translate(-50%, -50%); /* Center modal */
     }
 
     .modal-content h2 {
@@ -1588,5 +1644,22 @@ section{
 
     .modal-content .register-link {
         font-size: 0.9rem;
+    }
+
+    .box {
+        padding: 0.8rem; /* Further reduce padding on very small screens */
+    }
+
+    .add-to-cart-btn {
+        padding: 0.5rem 0.8rem; /* Further adjust padding */
+        font-size: 1rem; /* Adjust font size for readability */
+    }
+
+    .box .content h3 {
+        color: #fff;
+        font-size: 0.5rem;
+        white-space: nowrap; /* Prevent text from breaking into multiple lines */
+        overflow: hidden; /* Hide overflow text */
+        text-overflow: ellipsis; /* Add ellipsis to overflowing text */
     }
 }

@@ -398,62 +398,70 @@ section{
     text-align: center;
     margin-top: 1rem;
 }
-/* Common styles for both sections */
+/* General layout for all screen sizes */
 .box-container {
     display: flex;
     flex-wrap: wrap;
-    gap: 1.5rem;
-    align-items: flex-start;
+    gap: 1rem; /* Reduced gap for better compactness */
+    align-items: stretch; /* Stretch all boxes to be the same height */
     margin-bottom: 2rem;
     position: relative;
 }
 
+/* Ensuring all boxes maintain the same size on smaller screens */
 .box {
     text-align: center;
     border: var(--border);
-    padding: 1.5rem; /* Reduced padding for a more uniform look */
-    width: 30rem; /* Fixed width */
-    height: 40rem; /* Fixed height */
+    padding: 1rem; /* Reduced padding for uniformity on small screens */
+    width: 100%; /* Make the box take full width on small screens */
+    max-width: 30rem; /* Set a maximum width for the box */
+    min-height: 40rem; /* Set a minimum height to ensure all boxes are equal */
+    height: auto; /* Allow height to adjust based on content */
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    justify-content: space-between; /* Ensures space is distributed evenly */
+    justify-content: space-between;
+    flex: 1 1 calc(33.333% - 1rem); /* Flex-basis to keep boxes consistent in size */
+    overflow: hidden; /* Prevent content overflow */
 }
 
-/* Image styling */
+/* Ensure images scale well within the box */
 .box .image {
-    flex: 1; /* Takes up remaining space */
+    flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 1rem 0; /* Reduced padding */
+    padding: 1rem 0;
 }
 
 .box .image img {
     max-width: 100%;
-    max-height: 15rem; /* Ensures image fits well within box */
-    object-fit: cover; /* Ensures images do not get distorted */
+    height: auto;
+    object-fit: cover; /* Ensures no image distortion */
 }
 
-/* Content styling */
+/* Consistent content styling */
 .box .content {
-    flex: 2; /* Ensures content section is more prominent */
+    flex: 2;
 }
 
 .box .content h3 {
     color: #fff;
-    font-size: 2rem; /* Adjusted font size for consistency */
+    font-size: 1rem;
+    white-space: nowrap; /* Prevent text from breaking into multiple lines */
+    overflow: hidden; /* Hide overflow text */
+    text-overflow: ellipsis; /* Add ellipsis to overflowing text */
 }
 
 .box .content .price {
     color: #fff;
-    font-size: 2rem; /* Adjusted font size for consistency */
+    font-size: 2rem;
 }
 
 .box .content .price span {
     text-decoration: line-through;
     font-weight: lighter;
-    font-size: 1.4rem; /* Adjusted font size */
+    font-size: 1.4rem;
 }
 
 .box .content .stock {
@@ -1132,12 +1140,28 @@ section{
     #feedback-display .feedback-item .message {
         font-size: 1.6rem; /* Adjust message size on smaller screens */
     }
+    .box {
+        flex: 1 1 calc(50% - 1rem); /* Two items per row on medium screens */
+    }
+
+    .header .navbar {
+        width: 60%; /* More space for the navbar */
+    }
+
+    .modal-content {
+        width: 85%;
+        max-width: 350px; /* Adjust modal size for smaller screens */
+    }
+
+    /* Reduce feedback display padding */
+    #feedback-display {
+        padding: 1rem;
+    }
 }
 
 
+/* Styles for screens smaller than 768px */
 @media (max-width: 768px) {
-
-    /* Adjustments for screens smaller than 768px */
     html {
         font-size: 55%; /* Adjust font size for smaller screens */
     }
@@ -1189,11 +1213,14 @@ section{
         font-size: 1.5rem; /* Smaller font size for buttons */
         padding: 0.8rem; /* Smaller padding */
     }
+    .add-to-cart-btn {
+        padding: 0.8rem 1.5rem; /* Reduce padding for smaller screens */
+        font-size: 1.4rem; /* Smaller font size for better readability */
+    }
 }
 
+/* Styles for screens smaller than 450px */
 @media (max-width: 450px) {
-
-    /* Adjustments for screens smaller than 450px */
     html {
         font-size: 50%;
     }
@@ -1221,5 +1248,11 @@ section{
     .modal-content form button {
         font-size: 1.3rem; /* Further reduce button font size */
         padding: 0.6rem; /* Further reduce padding */
+    }
+    .add-to-cart-btn {
+        padding: 0.6rem 1.2rem; /* Even smaller padding for compact screens */
+        font-size: 1.2rem; /* Adjust font size for very small screens */
+        width: 100%; /* Make the button take full width on very small screens */
+        text-align: center; /* Center the text */
     }
 }

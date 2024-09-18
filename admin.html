@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/adminStyle.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.x/css/all.min.css">
+
     <title>ADMIN | JBC SCHOOL SUPPLIES AND HOUSEWARE</title>
 </head>
 <body>
@@ -142,6 +143,8 @@
         <div class="form-group">
             <label for="update-product-img">Product Image:</label>
             <input type="file" id="update-product-img" name="product-img" accept="image/*">
+            <!-- Image preview area -->
+            <img id="product-image-preview" src="" alt="No Image Available" style="max-width: 200px; display: block; margin-top: 10px;">
         </div>
         <div class="form-group">
             <label for="update-price">Price: ₱</label>
@@ -163,7 +166,6 @@
         <button type="button" class="btn cancel">Cancel</button>
         <button type="button" class="btn delete">Delete Product</button>
     </form>
-</section>
     
 
 <!-- FEEDBACK -->

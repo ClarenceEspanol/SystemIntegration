@@ -530,7 +530,7 @@ function handleProductItemClick(event) {
         const productId = item.dataset.productId;
         const productType = item.dataset.productType;
 
-        // Fetch product details
+        // Fetch product details from Firebase
         const productRef = ref(db, `/${productType}/${productId}`);
         get(productRef).then((snapshot) => {
             if (snapshot.exists()) {
@@ -543,18 +543,20 @@ function handleProductItemClick(event) {
                 document.getElementById('update-weight').value = product.weight || ''; // Set weight
                 document.getElementById('update-weight-unit').value = product.weightUnit || 'kg'; // Set weight unit
                 
-                const updateProductImg = document.getElementById('update-product-img');
+                // Handle the image
+                const productImagePreview = document.getElementById('product-image-preview');
                 if (product.productImg) {
-                    updateProductImg.src = product.productImg;
-                    updateProductImg.alt = `${product.name} Image`;
+                    productImagePreview.src = product.productImg; // Set image source from the database
+                    productImagePreview.alt = `${product.name} Image`; // Set alt text for the image
                 } else {
-                    updateProductImg.src = '';
-                    updateProductImg.alt = 'No Image Available';
+                    productImagePreview.src = ''; // Clear image if not available
+                    productImagePreview.alt = 'No Image Available'; // Fallback alt text
                 }
             }
         });
     }
 }
+
 
 // Function to handle form submission for updating a product
 document.getElementById('update-product-form')?.addEventListener('submit', async (e) => {
@@ -570,14 +572,16 @@ document.getElementById('update-product-form')?.addEventListener('submit', async
     const updateProductImg = document.getElementById('update-product-img').files[0];
 
     try {
-        let productImgUrl = null;
+        let productImgUrl = document.getElementById('product-image-preview').src; // Use the existing image URL from preview
+
+        // Check if a new image has been uploaded
         if (updateProductImg) {
             // Rename the image file based on the product ID
             const newFileName = `${productId}_${updateProductImg.name}`;
             // Upload image to Firebase Storage
             const imgRef = storageRef(storage, `images/${productType}/${newFileName}`);
             await uploadBytes(imgRef, updateProductImg);
-            productImgUrl = await getDownloadURL(imgRef);
+            productImgUrl = await getDownloadURL(imgRef); // Get new image URL
         }
 
         // Prepare the updated product data
@@ -588,14 +592,18 @@ document.getElementById('update-product-form')?.addEventListener('submit', async
             quantity: parseInt(quantity),
             weight: parseFloat(weight), // Include weight
             weightUnit: weightUnit, // Include weight unit
-            productImg: productImgUrl // Update the image URL here
+            productImg: productImgUrl // Use the existing or new image URL
         };
 
         // Save the updated product to the database
         await set(ref(db, `/${productType}/${productId}`), updatedProduct);
 
         // Clear the form after submission
-        document.querySelector('#update-product-form form')?.reset();
+        document.querySelector('#update-product-form')?.reset();
+
+        // Reset the image preview
+        document.getElementById('product-image-preview').src = '';
+        document.getElementById('product-image-preview').alt = 'No Image Available';
 
         alert('Product updated successfully!');
     } catch (error) {
@@ -603,9 +611,15 @@ document.getElementById('update-product-form')?.addEventListener('submit', async
     }
 });
 
+
 // Function to handle cancel button click
 document.querySelector('#update-product-form .cancel')?.addEventListener('click', () => {
     document.querySelector('#update-product-form form')?.reset(); // Ensure you target the form element
+    const imagePreview = document.getElementById('product-image-preview');
+    if (imagePreview) {
+        imagePreview.src = ''; // Clear the image source
+        imagePreview.alt = 'No Image Available'; // Optionally set alt text
+    }
 });
 
 // Function to delete a product
