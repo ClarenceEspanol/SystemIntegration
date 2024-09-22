@@ -960,6 +960,12 @@ document.addEventListener('DOMContentLoaded', () => {
                                         <button class="cancel-btn" data-order-id="${orderKey}">Cancel Order</button>
                                     `;
                                     ordersList.appendChild(orderItem);
+    
+                                    // Attach event listener to the cancel button
+                                    const cancelBtn = orderItem.querySelector('.cancel-btn');
+                                    cancelBtn.addEventListener('click', () => {
+                                        cancelOrder(orderKey);
+                                    });
                                 }
                             }).catch((error) => {
                                 console.error('Error fetching total amount:', error);
@@ -983,6 +989,35 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             ordersList.innerHTML = '<p>You need to log in to view orders.</p>';
             totalPriceElement.textContent = '₱0.00'; // Set total price to ₱0.00 for logged out users
+        }
+    }
+    async function cancelOrder(orderKey) {
+        const user = auth.currentUser;
+        if (user) {
+            const userId = user.uid;
+            const orderRef = ref(db, `orders/${userId}/${orderKey}`);
+    
+            // Fetch the order details to check the status
+            const orderSnapshot = await get(orderRef);
+            if (orderSnapshot.exists()) {
+                const orderData = orderSnapshot.val();
+    
+                // Check if the order status is pending
+                if (orderData.orderStatus === 'pending') {
+                    // Proceed to remove the order if it's pending
+                    await remove(orderRef);
+                    alert('Order canceled successfully.');
+                    populateOrdersModal(); // Refresh the orders modal after cancellation
+                } else {
+                    // Alert the user that the order cannot be canceled
+                    alert(`This order cannot be canceled as its status is "${orderData.orderStatus}".`);
+                }
+            } else {
+                console.error('Order does not exist:', orderKey);
+                alert('Order does not exist.');
+            }
+        } else {
+            alert('You need to log in to cancel an order.');
         }
     }
     async function populateOrderHistoryModal() {
@@ -1101,7 +1136,6 @@ document.addEventListener('DOMContentLoaded', function() {
     function centerModal() {
         const windowHeight = window.innerHeight;
         const modalHeight = modalContent.offsetHeight;
-
         if (modalHeight < windowHeight) {
             modalContent.style.top = '50%';
             modalContent.style.transform = 'translate(-50%, -50%)';
