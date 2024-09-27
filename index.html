@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="css/indexStyle.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.x/css/all.min.css">
+    
 
     
 </head>
@@ -400,6 +401,25 @@
     <div class="track-modal-content">
         <span class="close-btn">&times;</span>
         <h2>Order History</h2>
+        <div class="search-filters">
+            <div class="name-row">
+                <label for="search-name">Search By Product Name:</label>
+                <input type="text" id="search-name" placeholder="Type A Product Name...">
+            </div>
+            <div class="filter-row">
+                <label for="search-date-from">Search From:</label>
+                <input type="date" id="search-date-from">
+                
+                <label for="search-date-to">Search To:</label>
+                <input type="date" id="search-date-to">
+                
+                <label for="sort-order">Sort by:</label>
+                <select id="sort-order">
+                    <option value="date-desc">Date: Descending</option>
+                    <option value="date-asc">Date: Ascending</option>
+                </select>
+            </div>
+        </div>
         <div id="history-list"></div>
     </div>
 </div>

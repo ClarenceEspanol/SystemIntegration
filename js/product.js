@@ -674,6 +674,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const totalPriceElement = document.getElementById('total-price');
     const viewHistoryBtn = document.getElementById('view-history-btn');
 
+
+    // Event listeners for search filters
+    const searchNameInput = document.getElementById('search-name');
+    const searchDateFromInput = document.getElementById('search-date-from');
+    const searchDateToInput = document.getElementById('search-date-to');
+
+    searchNameInput.addEventListener('input', filterOrderHistory);
+    searchDateFromInput.addEventListener('input', filterOrderHistory);
+    searchDateToInput.addEventListener('input', filterOrderHistory);
+    // Add event listeners to the search inputs and sort order select
+    searchNameInput.addEventListener('input', filterOrderHistory);
+    searchDateFromInput.addEventListener('input', filterOrderHistory);
+    searchDateToInput.addEventListener('input', filterOrderHistory);
+    document.getElementById('sort-order').addEventListener('change', filterOrderHistory);
+
     if (trackOrdersLink) {
         trackOrdersLink.addEventListener('click', (event) => {
             event.preventDefault();
@@ -704,7 +719,81 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    async function populateOrdersModal() {
+
+    //filter order
+async function filterOrderHistory() {
+    const nameFilter = searchNameInput.value.toLowerCase(); // Get the search name filter input
+    const dateFromFilter = searchDateFromInput.value ? new Date(searchDateFromInput.value) : null; // Get the date-from filter input
+    const dateToFilter = searchDateToInput.value ? new Date(searchDateToInput.value) : null; // Get the date-to filter input
+    const sortOrder = document.getElementById('sort-order').value; // Get the sort order input
+    const orderItems = [...historyList.querySelectorAll('.order-item')]; // Get all order items as an array
+
+    // If the name filter is empty, call populateOrderHistoryModal() to display all orders
+    if (!nameFilter && !dateFromFilter && !dateToFilter) {
+        await populateOrderHistoryModal(); // Call the function to populate all order history
+        return; // Exit the function early
+    }
+
+    // Reset all orders to visible
+    orderItems.forEach(orderItem => {
+        orderItem.style.display = ''; // Make all orders visible initially
+    });
+
+    // Filter orders by name and date
+    let filteredOrders = orderItems.filter(orderItem => {
+        const productDetails = orderItem.querySelectorAll('.order-item-details p'); // Get all product details for the order
+        const orderDateElement = [...orderItem.querySelectorAll('p strong')].find(el => el.textContent.includes("Order Date:"));
+        const orderDate = orderDateElement ? new Date(orderDateElement.parentElement.textContent.replace('Order Date: ', '').trim()) : null;
+
+        let matchesName = true; // Default to true
+        let matchesDate = true;
+
+        // If the name filter is not empty, check for matches
+        if (nameFilter) {
+            matchesName = false; // Reset to false for matching
+            productDetails.forEach(detail => {
+                if (detail.textContent.toLowerCase().includes(nameFilter)) {
+                    matchesName = true;
+                }
+            });
+        }
+
+        // Check if the order date is within the specified range
+        if (orderDate) {
+            if (dateFromFilter && orderDate < dateFromFilter) matchesDate = false;
+            if (dateToFilter && orderDate > dateToFilter) matchesDate = false;
+        }
+
+        return matchesName && matchesDate; // Return true only if both name and date match
+    });
+
+    // Sort the filtered orders based on the selected sort order
+    filteredOrders.sort((a, b) => {
+        const dateAElement = [...a.querySelectorAll('p strong')].find(el => el.textContent.includes("Order Date:"));
+        const dateBElement = [...b.querySelectorAll('p strong')].find(el => el.textContent.includes("Order Date:"));
+
+        const dateA = dateAElement ? new Date(dateAElement.parentElement.textContent.replace('Order Date: ', '').trim()) : new Date(0);
+        const dateB = dateBElement ? new Date(dateBElement.parentElement.textContent.replace('Order Date: ', '').trim()) : new Date(0);
+
+        if (sortOrder === 'date-asc') {
+            return dateA - dateB; // Sort ascending
+        } else if (sortOrder === 'date-desc') {
+            return dateB - dateA; // Sort descending
+        }
+    });
+
+    // Clear the history list and display the sorted and filtered orders
+    historyList.innerHTML = '';
+    filteredOrders.forEach(orderItem => historyList.appendChild(orderItem));
+
+    // Handle case where no orders match the filters
+    if (filteredOrders.length === 0) {
+        historyList.innerHTML = '<p>No matching orders found.</p>';
+    }
+}
+
+     //orders modal
+     async function populateOrdersModal() {
         const user = auth.currentUser;
         if (user) {
             const userId = user.uid;
@@ -752,6 +841,12 @@ document.addEventListener('DOMContentLoaded', () => {
                                         <button class="cancel-btn" data-order-id="${orderKey}">Cancel Order</button>
                                     `;
                                     ordersList.appendChild(orderItem);
+    
+                                    // Attach event listener to the cancel button
+                                    const cancelBtn = orderItem.querySelector('.cancel-btn');
+                                    cancelBtn.addEventListener('click', () => {
+                                        cancelOrder(orderKey);
+                                    });
                                 }
                             }).catch((error) => {
                                 console.error('Error fetching total amount:', error);
@@ -777,7 +872,37 @@ document.addEventListener('DOMContentLoaded', () => {
             totalPriceElement.textContent = '₱0.00'; // Set total price to ₱0.00 for logged out users
         }
     }
-
+    //cancelorder
+    async function cancelOrder(orderKey) {
+        const user = auth.currentUser;
+        if (user) {
+            const userId = user.uid;
+            const orderRef = ref(db, `orders/${userId}/${orderKey}`);
+    
+            // Fetch the order details to check the status
+            const orderSnapshot = await get(orderRef);
+            if (orderSnapshot.exists()) {
+                const orderData = orderSnapshot.val();
+    
+                // Check if the order status is pending
+                if (orderData.orderStatus === 'pending') {
+                    // Proceed to remove the order if it's pending
+                    await remove(orderRef);
+                    alert('Order canceled successfully.');
+                    populateOrdersModal(); // Refresh the orders modal after cancellation
+                } else {
+                    // Alert the user that the order cannot be canceled
+                    alert(`This order cannot be canceled as its status is "${orderData.orderStatus}".`);
+                }
+            } else {
+                console.error('Order does not exist:', orderKey);
+                alert('Order does not exist.');
+            }
+        } else {
+            alert('You need to log in to cancel an order.');
+        }
+    }
+    //history orders
     async function populateOrderHistoryModal() {
         const user = auth.currentUser;
         
@@ -824,7 +949,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         orderItem.innerHTML += `
                             <p><strong>Order ID:</strong> ${order.orderId || 'N/A'}</p>
                             <p><strong>Total Price:</strong> ₱${orderTotal.toFixed(2)}</p>
-                            <p><strong>Status: ${order.orderStatus}</strong></p>
+                            <p><strong>Status:</strong> ${order.orderStatus}</p>
                             <p><strong>Payment Method:</strong> ${order.paymentMethod || 'N/A'}</p>
                             <p><strong>Order Date:</strong> ${order.timestamp ? new Date(order.timestamp).toLocaleDateString() : 'N/A'}</p>
                             <button class="reorder-btn" data-order-id="${orderKey}">Reorder</button>

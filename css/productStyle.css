@@ -997,11 +997,11 @@ section{
     position: fixed; /* Stay in place */
     z-index: 1; /* Sit on top */
     left: 0;
-    top: 80px;
+    top: 60px;
     width: 100%; /* Full width */
     height: 100%; /* Full height */
     overflow: auto; /* Enable scroll if needed */
-    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
 }
 
 #order-history-modal .track-modal-content {
@@ -1014,6 +1014,78 @@ section{
     max-height: 90vh; /* Limit height and enable scrolling if content is too long */
     overflow-y: auto; /* Enable vertical scrolling */
     border-radius: 10px; /* Rounded corners for the modal */
+}
+
+.search-filters {
+    display: flex; /* Use flexbox to align items */
+    flex-wrap: wrap; /* Allow wrapping for the filters */
+    margin-bottom: 15px; /* Space below the filters */
+    background-color: var(--black); /* Set a background color for better visibility */
+    padding: 10px; /* Add padding for spacing around filters */
+    border-radius: 5px; /* Rounded corners for the filter area */
+}
+
+.name-row {
+    flex-basis: 100%; /* Make the name row take full width */
+    display: flex; /* Flex for items in this row */
+    align-items: center; /* Center items vertically */
+}
+
+.filter-row {
+    flex-basis: 100%; /* Make the filter row take full width */
+    display: flex; /* Flex for items in this row */
+    justify-content: space-between; /* Space items evenly */
+    margin-top: 10px; /* Space above the filter row */
+}
+
+/* Adjustments for labels */
+.search-filters label {
+    color: white; /* Change label color to white for contrast */
+    white-space: nowrap; /* Prevent labels from wrapping */
+    font-size: 1.8rem; /* Increase font size for labels */
+    margin-right: 5px; /* Space between label and input */
+}
+
+/* Adjustments for input fields */
+.search-filters input[type="text"],
+.search-filters input[type="date"],
+.search-filters select {
+    padding: 5px; /* Add padding inside inputs for comfort */
+    border-radius: 5px; /* Rounded corners for inputs */
+    border: var(--border); /* Use the defined border variable */
+    background-color: white; /* Change input background to white */
+    color: var(--black); /* Text color in inputs for better readability */
+    font-size: 1.2rem; /* Increase font size for inputs */
+}
+
+/* Set input field widths to utilize available space */
+.search-filters input[type="text"] {
+    flex: 1; /* Allow text input to grow */
+}
+
+.search-filters input[type="date"] {
+    flex: 0 1 120px; /* Set a flexible width for date inputs */
+    margin-right: 15px; /* Space between date inputs */
+}
+
+.search-filters select {
+    flex: 0 1 130px; /* Set a flexible width for the select dropdown */
+}
+
+/* Reorder Button */
+.reorder-btn {
+    background-color: #28a745; /* Green background for reorder button */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px; /* Font size for the button */
+    margin-top: 10px; /* Margin for spacing */
+    cursor: pointer;
+    border-radius: 5px; /* Rounded corners for the button */
+    transition: background-color 0.3s, box-shadow 0.3s; /* Smooth transition */
 }
 
 /* Reorder Button */
@@ -1040,14 +1112,22 @@ section{
 .reorder-btn:focus, .reorder-btn:hover {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
 }
+/* Adjust history list to ensure it does not overlap */
 #history-list {
     margin-top: 20px;
+    overflow-y: auto; /* Enable scrolling if history list is too long */
+    max-height: calc(90vh - 220px); /* Adjust max height based on modal padding */
 }
 
 #history-list .order-item {
     background-color: #f0f0f0; /* Slightly different background for history items */
+    padding: 10px; /* Padding for each order item */
+    border-radius: 5px; /* Rounded corners for order items */
+    margin-bottom: 10px; /* Space between order items */
 }
 
+
+/*shipping */
 .shipping-provider {
     font-size: 14px; /* Adjust the font size as needed */
     color: #D71920;  /* J&T Express red color */
