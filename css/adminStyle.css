@@ -233,6 +233,37 @@ header {
     text-align: center;
     margin: 0;
 }
+/* Subheading Container */
+.update-product-form .product-list-container .subheading-container {
+    display: flex;
+    justify-content: space-between; /* Aligns heading to left, button to right */
+    align-items: center;
+    background-color: var(--main-color); /* Background color to distinguish */
+    color: #fff;
+    padding: 10px;
+    border-radius: 8px 8px 0 0; /* Rounded corners at the top */
+    font-size: 1.8rem;
+    font-weight: bold;
+    margin: 0;
+}
+
+/* Download Reports Button */
+.update-product-form .product-list-container .download-reports {
+    background-color: #fff;
+    color: var(--main-color);
+    padding: 10px 20px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.update-product-form .product-list-container .download-reports:hover {
+    background-color: var(--black);
+    color: #fff;
+}
 
 /* Product List */
 .update-product-form .product-list {
@@ -513,7 +544,10 @@ header {
     margin-bottom: 10px;
     border-bottom: 1px solid #eee;
 }
-
+/* Hide the notification count by default */
+.notification-count {
+    display: none;
+}
 .notification-item:last-child {
     margin-bottom: 0;
     border-bottom: none; /* Remove the border from the last item */

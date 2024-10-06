@@ -341,49 +341,43 @@ modal.style.display = "none";
     }
 }
 
+
 // Function to update the notification count
 function updateNotificationCount(count) {
-const notificationCount = document.getElementById("notification-count");
-notificationCount.innerText = count;
-if (count > 0) {
-notificationCount.style.display = "block";
-} else {
-notificationCount.style.display = "none";
-}
+    const notificationCount = document.getElementById("notification-count");
+    if (count > 0) {
+        notificationCount.innerText = count;
+        notificationCount.style.display = "block"; // Show the count if there are notifications
+    } else {
+        notificationCount.style.display = "none"; // Hide the count if no notifications
+    }
 }
 
-// Function to load products and generate notifications for low stock
+// Function to load and monitor products for low stock in real-time
 function loadProductsAndNotify() {
     const schoolSuppliesRef = ref(db, '/school-supplies');
     const housewareRef = ref(db, '/houseware');
 
     let lowStockNotifications = [];
 
-    function processProducts(snapshot, productType) {
-        if (snapshot.exists()) {
-            const products = snapshot.val();
-            Object.values(products).forEach(product => {
-                if (product.quantity < 10) {
-                    lowStockNotifications.push({
-                        name: product.name,
-                        img: product.productImg,
-                        quantity: product.quantity
-                    });
-                }
-            });
-        }
+    // Process products and generate notifications
+    function processProducts(products) {
+        lowStockNotifications = []; // Reset notifications
+        Object.values(products).forEach(product => {
+            if (product.quantity < 10) {
+                lowStockNotifications.push({
+                    name: product.name,
+                    img: product.productImg,
+                    quantity: product.quantity
+                });
+            }
+        });
+        // Update notifications list in real-time
+        updateNotificationsDisplay();
     }
 
-    onValue(schoolSuppliesRef, (snapshot) => {
-        processProducts(snapshot, 'school-supplies');
-    });
-
-    onValue(housewareRef, (snapshot) => {
-        processProducts(snapshot, 'houseware');
-    });
-
-    // Delay to ensure both school supplies and houseware are processed
-    setTimeout(() => {
+    // Function to display notifications in the modal and update the count
+    function updateNotificationsDisplay() {
         const notificationsList = document.getElementById('notifications-list');
         notificationsList.innerHTML = '';
 
@@ -402,7 +396,6 @@ function loadProductsAndNotify() {
 
                 notificationItem.appendChild(img);
                 notificationItem.appendChild(text);
-
                 notificationsList.appendChild(notificationItem);
             });
             updateNotificationCount(lowStockNotifications.length);
@@ -410,10 +403,24 @@ function loadProductsAndNotify() {
             notificationsList.innerHTML = '<p>No new notifications.</p>';
             updateNotificationCount(0);
         }
-    }, 1000); // Adjust the delay as needed
+    }
+
+    // Monitor school supplies for changes in real-time
+    onValue(schoolSuppliesRef, (snapshot) => {
+        if (snapshot.exists()) {
+            processProducts(snapshot.val());
+        }
+    });
+
+    // Monitor houseware for changes in real-time
+    onValue(housewareRef, (snapshot) => {
+        if (snapshot.exists()) {
+            processProducts(snapshot.val());
+        }
+    });
 }
 
-// Call the renamed function
+// Initialize notifications on page load
 loadProductsAndNotify();
 
 
@@ -783,6 +790,169 @@ function loadUsers() {
         console.error("Error loading user data:", error);
     });
 }
+
+// Global array to hold product data
+let productsData = [];
+
+document.addEventListener('DOMContentLoaded', () => {
+    const downloadBtn = document.querySelector('.download-reports');
+    if (downloadBtn) {
+        downloadBtn.addEventListener('click', async () => {
+            try {
+                await fetchProductsData(); // Wait for data to be fetched before generating PDF
+                await generatePDFReport(); // Ensure PDF generation is awaited
+            } catch (error) {
+                console.error('Error fetching product data:', error);
+            }
+        });
+    }
+});
+
+// Function to fetch products data from Firebase
+async function fetchProductsData() {
+    const schoolSuppliesRef = ref(db, 'school-supplies');
+    const housewareRef = ref(db, 'houseware');
+
+    const schoolSuppliesSnapshot = await get(schoolSuppliesRef);
+    const housewareSnapshot = await get(housewareRef);
+
+    const schoolSupplies = schoolSuppliesSnapshot.val() || {};
+    const houseware = housewareSnapshot.val() || {};
+
+    // Log the number of products fetched from each node
+    console.log('School Supplies Count:', Object.keys(schoolSupplies).length);
+    console.log('Houseware Count:', Object.keys(houseware).length);
+
+    productsData = [];
+    for (const id in schoolSupplies) {
+        productsData.push({ id, ...schoolSupplies[id], type: 'school-supplies' });
+    }
+    for (const id in houseware) {
+        productsData.push({ id, ...houseware[id], type: 'houseware' });
+    }
+
+    // Log the total number of products retrieved
+    console.log('Total Products Loaded:', productsData.length);
+}
+
+// Function to generate the PDF report
+async function generatePDFReport() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    const margin = 10;
+    const pageHeight = doc.internal.pageSize.getHeight();
+    let yPosition = 20;
+
+    const logoPath = 'images/logojbc.png';
+    const logoImg = await loadImage(logoPath);
+    doc.addImage(logoImg, 'PNG', 10, 10, 30, 25);
+
+    // Add Title
+    doc.setFontSize(18);
+    const title = 'JBC SCHOOL SUPPLIES AND HOUSEWARE';
+    const titleWidth = doc.getTextWidth(title);
+    const titleX = (doc.internal.pageSize.getWidth() - titleWidth) / 2; // Center the title
+    doc.text(title, titleX, 30);
+    doc.setFontSize(12);
+    doc.text('============================================================================', margin, 40);
+    yPosition = 50; // Adjust yPosition for the report content
+
+    // Add report title centered
+    doc.setFontSize(18);
+    const reportTitle = 'STOCKS REPORT';
+    const reportTitleWidth = doc.getTextWidth(reportTitle);
+    const reportTitleX = (doc.internal.pageSize.getWidth() - reportTitleWidth) / 2; // Center the report title
+    doc.text(reportTitle, reportTitleX, yPosition);
+    yPosition += 10;
+
+    // Separate products by type and sort by quantity
+    const productTypes = {
+        'houseware': productsData.filter(product => product.type === 'houseware').sort((a, b) => a.quantity - b.quantity),
+        'school-supplies': productsData.filter(product => product.type === 'school-supplies').sort((a, b) => a.quantity - b.quantity),
+    };
+
+    // Add products to PDF
+    addProductsToPDF(productTypes.houseware, 'houseware');
+    addProductsToPDF(productTypes['school-supplies'], 'school supplies');
+
+    doc.save('Stocks_Report.pdf');
+
+    // Function to add products of a specific type to the PDF
+    function addProductsToPDF(products, type) {
+        doc.setFontSize(14);
+        doc.setFont('helvetica', 'bold');
+        
+        // Center the type heading
+        const heading = type.charAt(0).toUpperCase() + type.slice(1) + ':';
+        const headingWidth = doc.getTextWidth(heading);
+        const headingX = (doc.internal.pageSize.getWidth() - headingWidth) / 2; // Center the heading
+        doc.text(heading, headingX, yPosition);
+        
+        yPosition += 8; // Space after the type heading
+        doc.setFont('helvetica', 'normal');
+
+        products.forEach(product => {
+            // Check if we need to create a new page
+            if (yPosition > pageHeight - 30) { // Adjust based on desired space for footer
+                doc.addPage();
+                yPosition = 20; // Reset position for new page
+            }
+
+            doc.setFont('helvetica', 'bold'); // Product name in bold
+            doc.text(`Name: ${product.name}`, margin, yPosition);
+            yPosition += 8; // Space after product name
+
+            doc.setFont('helvetica', 'normal');
+            const priceText = `Price: P${product.price.toFixed(2)}`;
+            const stockStatusText = `Quantity Status: ${getStockStatus(product.quantity)}`;
+            const quantityText = `Quantity: ${product.quantity}`;
+
+            // Calculate available width for price and stock status
+            const availableWidth = doc.internal.pageSize.getWidth() - margin * 2;
+
+            // Set font size for price and quantity status
+            const stockStatusWidth = doc.getTextWidth(stockStatusText);
+            const priceXPosition = margin; // Left align price
+            const stockStatusXPosition = availableWidth - stockStatusWidth - margin; // Right align stock status
+
+            // Add price and stock status on the same line
+            doc.text(priceText, priceXPosition, yPosition);
+            doc.text(stockStatusText, stockStatusXPosition, yPosition);
+            yPosition += 8; // Space after price and stock status
+
+            doc.setFont('helvetica', 'normal'); // Reset font to normal
+            doc.text(quantityText, margin, yPosition);
+            yPosition += 10; // Extra space after quantity
+
+            // Add separator line
+            doc.line(margin, yPosition, doc.internal.pageSize.getWidth() - margin, yPosition);
+            yPosition += 5; // Space after separator
+        });
+        yPosition += 5; // Space between different types
+    }
+}
+
+// Example function to load an image (you'll need to implement this)
+async function loadImage(url) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.src = url;
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+    });
+}
+
+// Example function to get stock status (you'll need to implement this)
+function getStockStatus(quantity) {
+    if (quantity >= 30) return 'Sufficient Stock';
+    if (quantity >= 10) return 'Moderate Stock';
+    return 'Low Stock';
+}
+
+
+
+
+
 
 
 

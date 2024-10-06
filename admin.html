@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/adminStyle.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.x/css/all.min.css">
 
     <title>ADMIN | JBC SCHOOL SUPPLIES AND HOUSEWARE</title>
@@ -108,7 +109,10 @@
 <section class="update-product-form" id="update-product-form">
     <h1 class="heading"><span>Update Product</span></h1>
     <div class="product-list-container">
-        <h2 class="subheading"><span>Product List</span></h2>
+        <div class="subheading-container">
+            <h2 class="subheading"><span>Product List</span></h2>
+            <button class="btn download-reports" id="download-reports-btn">Download Reports</button>
+        </div>
         <div class="product-list">
             <div class="product-category" id="school-supplies">
                 <h3>School Supplies:</h3>
@@ -197,5 +201,9 @@
 </div>
     
     <script type="module" src="js/adminscript.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+
 </body>
 </html>
