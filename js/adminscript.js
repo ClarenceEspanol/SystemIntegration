@@ -835,12 +835,14 @@ async function fetchProductsData() {
     console.log('Total Products Loaded:', productsData.length);
 }
 
+
 // Function to generate the PDF report
 async function generatePDFReport() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
     const margin = 10;
     const pageHeight = doc.internal.pageSize.getHeight();
+    const pageWidth = doc.internal.pageSize.getWidth();
     let yPosition = 20;
 
     const logoPath = 'images/logojbc.png';
@@ -850,104 +852,124 @@ async function generatePDFReport() {
     // Add Title
     doc.setFontSize(18);
     const title = 'JBC SCHOOL SUPPLIES AND HOUSEWARE';
-    const titleWidth = doc.getTextWidth(title);
-    const titleX = (doc.internal.pageSize.getWidth() - titleWidth) / 2; // Center the title
+    const titleX = (pageWidth - doc.getTextWidth(title)) / 2;
     doc.text(title, titleX, 30);
+
     doc.setFontSize(12);
     doc.text('============================================================================', margin, 40);
-    yPosition = 50; // Adjust yPosition for the report content
+    yPosition = 50;
 
-    // Add report title centered
-    doc.setFontSize(18);
-    const reportTitle = 'STOCKS REPORT';
-    const reportTitleWidth = doc.getTextWidth(reportTitle);
-    const reportTitleX = (doc.internal.pageSize.getWidth() - reportTitleWidth) / 2; // Center the report title
-    doc.text(reportTitle, reportTitleX, yPosition);
-    yPosition += 10;
-
-    // Separate products by type and sort by quantity
+    // Separate products by type and sort them
     const productTypes = {
-        'houseware': productsData.filter(product => product.type === 'houseware').sort((a, b) => a.quantity - b.quantity),
-        'school-supplies': productsData.filter(product => product.type === 'school-supplies').sort((a, b) => a.quantity - b.quantity),
+        'houseware': productsData.filter(p => p.type === 'houseware').sort((a, b) => a.quantity - b.quantity),
+        'school-supplies': productsData.filter(p => p.type === 'school-supplies').sort((a, b) => a.quantity - b.quantity),
     };
 
-    // Add products to PDF
-    addProductsToPDF(productTypes.houseware, 'houseware');
-    addProductsToPDF(productTypes['school-supplies'], 'school supplies');
+    // Add Products Table for each product type
+    addProductsToPDF(productTypes.houseware, 'Houseware');
+    addProductsToPDF(productTypes['school-supplies'], 'School Supplies');
 
     doc.save('Stocks_Report.pdf');
 
-    // Function to add products of a specific type to the PDF
     function addProductsToPDF(products, type) {
+        // Center the section title
         doc.setFontSize(14);
         doc.setFont('helvetica', 'bold');
-        
-        // Center the type heading
-        const heading = type.charAt(0).toUpperCase() + type.slice(1) + ':';
-        const headingWidth = doc.getTextWidth(heading);
-        const headingX = (doc.internal.pageSize.getWidth() - headingWidth) / 2; // Center the heading
-        doc.text(heading, headingX, yPosition);
-        
-        yPosition += 8; // Space after the type heading
-        doc.setFont('helvetica', 'normal');
+        const headingX = (pageWidth - doc.getTextWidth(type + ':')) / 2;
+        doc.text(`${type}:`, headingX, yPosition);
+        yPosition += 10;
 
+        // Define table headers and column widths
+        const headers = ['Product Name', 'Price', 'Quantity', 'Quantity Status'];
+        const columnWidths = [90, 30, 25, 45]; // Adjusted widths to prevent overlap
+
+        drawTableHeaders(headers, columnWidths);
+
+        // Add product rows
+        doc.setFont('helvetica', 'normal');
         products.forEach(product => {
-            // Check if we need to create a new page
-            if (yPosition > pageHeight - 30) { // Adjust based on desired space for footer
+            if (yPosition > pageHeight - 30) {
                 doc.addPage();
-                yPosition = 20; // Reset position for new page
+                yPosition = 20;
+                drawTableHeaders(headers, columnWidths); // Redraw headers on new page
             }
 
-            doc.setFont('helvetica', 'bold'); // Product name in bold
-            doc.text(`Name: ${product.name}`, margin, yPosition);
-            yPosition += 8; // Space after product name
+            const row = [
+                product.name,
+                `P${product.price.toFixed(2)}`,
+                product.quantity.toString(),
+                getStockStatus(product.quantity),
+            ];
 
-            doc.setFont('helvetica', 'normal');
-            const priceText = `Price: P${product.price.toFixed(2)}`;
-            const stockStatusText = `Quantity Status: ${getStockStatus(product.quantity)}`;
-            const quantityText = `Quantity: ${product.quantity}`;
-
-            // Calculate available width for price and stock status
-            const availableWidth = doc.internal.pageSize.getWidth() - margin * 2;
-
-            // Set font size for price and quantity status
-            const stockStatusWidth = doc.getTextWidth(stockStatusText);
-            const priceXPosition = margin; // Left align price
-            const stockStatusXPosition = availableWidth - stockStatusWidth - margin; // Right align stock status
-
-            // Add price and stock status on the same line
-            doc.text(priceText, priceXPosition, yPosition);
-            doc.text(stockStatusText, stockStatusXPosition, yPosition);
-            yPosition += 8; // Space after price and stock status
-
-            doc.setFont('helvetica', 'normal'); // Reset font to normal
-            doc.text(quantityText, margin, yPosition);
-            yPosition += 10; // Extra space after quantity
-
-            // Add separator line
-            doc.line(margin, yPosition, doc.internal.pageSize.getWidth() - margin, yPosition);
-            yPosition += 5; // Space after separator
+            drawTableRow(row, columnWidths);
         });
-        yPosition += 5; // Space between different types
+
+        yPosition += 10;
+    }
+
+    function drawTableHeaders(headers, columnWidths) {
+        let x = margin;
+        headers.forEach((header, index) => {
+            const centerX = x + (columnWidths[index] - doc.getTextWidth(header)) / 2;
+            doc.text(header, centerX, yPosition); // Center-align all headers
+            x += columnWidths[index];
+
+            // Draw a vertical line between columns (with better alignment)
+            if (index < headers.length - 1) {
+                drawVerticalLine(x);
+            }
+        });
+        yPosition += 10;
+    }
+
+    function drawTableRow(row, columnWidths) {
+        let x = margin;
+        row.forEach((data, index) => {
+            let textY = yPosition;
+
+            // Auto-wrap product name
+            if (index === 0) {
+                const lines = doc.splitTextToSize(data, columnWidths[index] - 5); // Allow for padding
+                lines.forEach(line => {
+                    doc.text(line, x, textY);
+                    textY += 6;
+                });
+            } else {
+                const centerX = x + (columnWidths[index] - doc.getTextWidth(data)) / 2;
+                doc.text(data, centerX, yPosition); // Center-align text
+            }
+            x += columnWidths[index];
+
+            // Draw a vertical line between columns (with better alignment)
+            if (index < row.length - 1) {
+                drawVerticalLine(x);
+            }
+        });
+        yPosition += 12; // Added space between rows
+    }
+
+    function drawVerticalLine(x) {
+        doc.line(x, yPosition - 10, x, yPosition + 2); // Adjusted height for cleaner lines
+    }
+
+    async function loadImage(url) {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.src = url;
+            img.onload = () => resolve(img);
+            img.onerror = reject;
+        });
+    }
+
+    function getStockStatus(quantity) {
+        if (quantity >= 30) return 'Sufficient Stock';
+        if (quantity >= 10) return 'Moderate Stock';
+        return 'Low Stock';
     }
 }
 
-// Example function to load an image (you'll need to implement this)
-async function loadImage(url) {
-    return new Promise((resolve, reject) => {
-        const img = new Image();
-        img.src = url;
-        img.onload = () => resolve(img);
-        img.onerror = reject;
-    });
-}
 
-// Example function to get stock status (you'll need to implement this)
-function getStockStatus(quantity) {
-    if (quantity >= 30) return 'Sufficient Stock';
-    if (quantity >= 10) return 'Moderate Stock';
-    return 'Low Stock';
-}
+
 
 
 

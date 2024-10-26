@@ -720,80 +720,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
 
-    //filter order
-async function filterOrderHistory() {
-    const nameFilter = searchNameInput.value.toLowerCase(); // Get the search name filter input
-    const dateFromFilter = searchDateFromInput.value ? new Date(searchDateFromInput.value) : null; // Get the date-from filter input
-    const dateToFilter = searchDateToInput.value ? new Date(searchDateToInput.value) : null; // Get the date-to filter input
-    const sortOrder = document.getElementById('sort-order').value; // Get the sort order input
-    const orderItems = [...historyList.querySelectorAll('.order-item')]; // Get all order items as an array
-
-    // If the name filter is empty, call populateOrderHistoryModal() to display all orders
-    if (!nameFilter && !dateFromFilter && !dateToFilter) {
-        await populateOrderHistoryModal(); // Call the function to populate all order history
-        return; // Exit the function early
-    }
-
-    // Reset all orders to visible
-    orderItems.forEach(orderItem => {
-        orderItem.style.display = ''; // Make all orders visible initially
-    });
-
-    // Filter orders by name and date
-    let filteredOrders = orderItems.filter(orderItem => {
-        const productDetails = orderItem.querySelectorAll('.order-item-details p'); // Get all product details for the order
-        const orderDateElement = [...orderItem.querySelectorAll('p strong')].find(el => el.textContent.includes("Order Date:"));
-        const orderDate = orderDateElement ? new Date(orderDateElement.parentElement.textContent.replace('Order Date: ', '').trim()) : null;
-
-        let matchesName = true; // Default to true
-        let matchesDate = true;
-
-        // If the name filter is not empty, check for matches
-        if (nameFilter) {
-            matchesName = false; // Reset to false for matching
-            productDetails.forEach(detail => {
-                if (detail.textContent.toLowerCase().includes(nameFilter)) {
-                    matchesName = true;
-                }
-            });
-        }
-
-        // Check if the order date is within the specified range
-        if (orderDate) {
-            if (dateFromFilter && orderDate < dateFromFilter) matchesDate = false;
-            if (dateToFilter && orderDate > dateToFilter) matchesDate = false;
-        }
-
-        return matchesName && matchesDate; // Return true only if both name and date match
-    });
-
-    // Sort the filtered orders based on the selected sort order
-    filteredOrders.sort((a, b) => {
-        const dateAElement = [...a.querySelectorAll('p strong')].find(el => el.textContent.includes("Order Date:"));
-        const dateBElement = [...b.querySelectorAll('p strong')].find(el => el.textContent.includes("Order Date:"));
-
-        const dateA = dateAElement ? new Date(dateAElement.parentElement.textContent.replace('Order Date: ', '').trim()) : new Date(0);
-        const dateB = dateBElement ? new Date(dateBElement.parentElement.textContent.replace('Order Date: ', '').trim()) : new Date(0);
-
-        if (sortOrder === 'date-asc') {
-            return dateA - dateB; // Sort ascending
-        } else if (sortOrder === 'date-desc') {
-            return dateB - dateA; // Sort descending
-        }
-    });
-
-    // Clear the history list and display the sorted and filtered orders
-    historyList.innerHTML = '';
-    filteredOrders.forEach(orderItem => historyList.appendChild(orderItem));
-
-    // Handle case where no orders match the filters
-    if (filteredOrders.length === 0) {
-        historyList.innerHTML = '<p>No matching orders found.</p>';
-    }
-}
-
-     //orders modal
-     async function populateOrdersModal() {
+    //orders modal
+    async function populateOrdersModal() {
         const user = auth.currentUser;
         if (user) {
             const userId = user.uid;
@@ -1000,6 +928,78 @@ async function filterOrderHistory() {
             }
         } else {
             historyList.innerHTML = '<p>You need to log in to view order history.</p>';
+        }
+    }
+
+    // Main function to filter order history
+    async function filterOrderHistory() {
+        await populateOrderHistoryModal(); // Populate all orders first
+
+        const nameFilter = searchNameInput.value.toLowerCase(); // Get the search name filter input
+        const dateFromFilter = searchDateFromInput.value ? new Date(searchDateFromInput.value) : null; // Get the date-from filter input
+        const dateToFilter = searchDateToInput.value ? new Date(searchDateToInput.value) : null; // Get the date-to filter input
+        const sortOrder = document.getElementById('sort-order').value; // Get the sort order input
+        const orderItems = [...historyList.querySelectorAll('.order-item')]; // Get all order items as an array
+
+        // If all filters are empty, there's no need to filter further
+        if (!nameFilter && !dateFromFilter && !dateToFilter) {
+            return; // Exit the function early, as all orders are already displayed
+        }
+
+        // Filter orders by name and date
+        let filteredOrders = orderItems.filter(orderItem => {
+            const productDetails = orderItem.querySelectorAll('.order-item-details p'); // Get all product details for the order
+            const orderDateElement = [...orderItem.querySelectorAll('p strong')].find(el => el.textContent.includes("Order Date:"));
+            const orderDateText = orderDateElement ? orderDateElement.parentElement.textContent.replace('Order Date: ', '').trim() : null;
+
+            // Convert the order date to a Date object, handle potential invalid dates
+            const orderDate = orderDateText ? new Date(orderDateText) : null; // Parse the order date
+            const orderDateValid = !isNaN(orderDate); // Check if order date is valid
+
+            let matchesName = true; // Default to true
+            let matchesDate = true;
+
+            // If the name filter is not empty, check for matches
+            if (nameFilter) {
+                matchesName = Array.from(productDetails).some(detail => detail.textContent.toLowerCase().includes(nameFilter));
+            }
+
+            // Check if the order date is within the specified range only if the date is valid
+            if (orderDateValid) {
+                const isAfterDateFrom = !dateFromFilter || orderDate >= dateFromFilter; // Check if order date is after or equal to the from date
+                const isBeforeDateTo = !dateToFilter || orderDate <= dateToFilter; // Check if order date is before or equal to the to date
+
+                matchesDate = isAfterDateFrom && isBeforeDateTo; // Order date matches if it's within the specified range
+            } else {
+                matchesDate = false; // Invalidate matchesDate if order date is invalid
+            }
+
+            return matchesName && matchesDate; // Return true only if both name and date match
+        });
+
+        // Sort the filtered orders based on the selected sort order
+        filteredOrders.sort((a, b) => {
+            const dateAElement = [...a.querySelectorAll('p strong')].find(el => el.textContent.includes("Order Date:"));
+            const dateBElement = [...b.querySelectorAll('p strong')].find(el => el.textContent.includes("Order Date:"));
+
+            const dateA = dateAElement ? new Date(dateAElement.parentElement.textContent.replace('Order Date: ', '').trim()) : new Date(0);
+            const dateB = dateBElement ? new Date(dateBElement.parentElement.textContent.replace('Order Date: ', '').trim()) : new Date(0);
+
+            if (sortOrder === 'date-asc') {
+                return dateA - dateB; // Sort ascending
+            } else if (sortOrder === 'date-desc') {
+                return dateB - dateA; // Sort descending
+            }
+            return 0; // No sorting if sortOrder is not recognized
+        });
+
+        // Clear the history list and display the sorted and filtered orders
+        historyList.innerHTML = '';
+        filteredOrders.forEach(orderItem => historyList.appendChild(orderItem));
+
+        // Handle case where no orders match the filters
+        if (filteredOrders.length === 0) {
+            historyList.innerHTML = '<p>No matching orders found.</p>';
         }
     }
 });

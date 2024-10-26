@@ -1317,7 +1317,23 @@ section{
 .cancel-btn:hover {
     background-color: #c62828; /* Darker red on hover */
 }
+.received-btn {
+    background-color: #4CAF50; /* Green background for received */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px; /* Font size for the button */
+    margin-top: 10px;
+    cursor: pointer;
+    border-radius: 5px; /* Rounded corners for the button */
+}
 
+.received-btn:hover {
+    background-color: #388E3C; /* Darker green on hover */
+}
 /* Total price container styling */
 #total-price-container {
     margin-top: 20px;
