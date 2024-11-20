@@ -1,8 +1,8 @@
 :root{
     --main-color:green;
     --black:#13131a;
-    --bg:#010103;
-    --border:.1rem solid rgba(255,255,255,.3);
+    --bg:white;
+    --border:.1rem solid black;
 }
 * {
     margin: 0; padding: 0;
@@ -37,7 +37,7 @@ section{
 }
 .heading{
     text-align: center;
-    color: #fff;
+    color: black;
     text-transform: uppercase;
     padding-bottom: 3.5rem;
     font-size: 4rem;
@@ -51,7 +51,7 @@ section{
     display: inline-block;
     padding: .9rem 3rem;
     font-size: 1.7rem;
-    color: #fff;
+    color: black;
     background: var(--main-color);
     cursor: pointer;
 }
@@ -59,7 +59,7 @@ section{
     letter-spacing: .2rem;
 }
 .header {
-    background: var(--bg);
+    background: black;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -72,7 +72,7 @@ section{
 
 .title {
     font-size: 2rem;
-    color: #fff;
+    color: white;
     margin: 0;
 }
 
@@ -250,6 +250,7 @@ section{
     display: flex;
     align-items: center;
     background: var(--black);
+    border-radius: 10px;
     flex-wrap: wrap;
 }
 .about .row .image{
@@ -320,7 +321,7 @@ section{
 }
 
 .school .box-container .box .content h3 {
-    color: #fff;
+    color: black;
     font-size: 2.5rem;
 }
 
@@ -334,7 +335,7 @@ section{
 }
 
 .school .box-container .box .content .price {
-    color: #fff;
+    color: black;
     font-size: 2.5rem;
 }
 
@@ -377,7 +378,7 @@ section{
     line-height: 5rem;
     font-size: 2rem;
     border: var(--border);
-    color: #fff;
+    color: black;
     margin: .3rem;
 }
 
@@ -394,7 +395,7 @@ section{
 }
 
 .houseware .box-container .box .content h3 {
-    color: #fff;
+    color: black;
     font-size: 2.5rem;
 }
 
@@ -408,7 +409,7 @@ section{
 }
 
 .houseware .box-container .box .content .price {
-    color: #fff;
+    color: black;
     font-size: 2.5rem;
 }
 
@@ -468,12 +469,12 @@ section{
 }
 
 .box .content h3 {
-    color: #fff;
+    color: black;
     font-size: 2rem; /* Adjusted font size for consistency */
 }
 
 .box .content .price {
-    color: #fff;
+    color: black;
     font-size: 2rem; /* Adjusted font size for consistency */
 }
 
@@ -485,7 +486,7 @@ section{
 
 .box .content .stock {
     font-size: 1.5rem;
-    color: #fff;
+    color: black;
 }
 
 .show {
@@ -496,7 +497,8 @@ section{
 /* contact design */
 .contact .row {
     display: flex;
-    background: var(--black);
+    background: white;
+    border: var(--border);
     flex-wrap: wrap;
     gap: 1rem;
 }
@@ -517,7 +519,7 @@ section{
 .contact .row .contact-info h3 {
     text-transform: uppercase;
     font-size: 3.5rem;
-    color: #fff;
+    color: black;
     margin-bottom: 2rem;
 }
 
@@ -525,7 +527,7 @@ section{
     margin-bottom: 2rem;
     display: flex;
     align-items: center;
-    color: #fff;
+    color: black;
 }
 
 .contact .row .contact-info .info-item span {
@@ -553,7 +555,7 @@ section{
 .contact .row form h3 {
     text-transform: uppercase;
     font-size: 3.5rem;
-    color: #fff;
+    color: black;
 }
 
 .contact .row form .inputBox {
@@ -561,12 +563,12 @@ section{
     align-items: center;
     margin-top: 2rem;
     margin-bottom: 2rem;
-    background: var(--black);
+    background: white;
     border: var(--border);
 }
 
 .contact .row form .inputBox span {
-    color: #fff;
+    color: black;
     font-size: 2rem;
     padding-left: 2rem;
     float: left;
@@ -595,7 +597,8 @@ section{
 /* feedback design*/
 .feedback .row{
     display: flex;
-    background: var(--black);
+    background: white;
+    border: var(--border);
     flex-wrap: wrap;
     gap: 1rem;
 }
@@ -613,18 +616,18 @@ section{
 .feedback .row form h3{
     text-transform: uppercase;
     font-size: 3.5rem;
-    color: #fff;
+    color: black;
 }
 .feedback .row form .inputBox{
     display: flex;
     align-items: center;
     margin-top: 2rem;
     margin-bottom: 2rem;
-    background: var(--black);
+    background: white;
     border: var(--border);
 }
 .feedback .row form .inputBox span{
-    color: #fff;
+    color: black;
     font-size: 2rem;
     padding-left: 2rem;
     float: left;
@@ -634,7 +637,7 @@ section{
     width: 100%;
     padding: 2rem;
     font-size: 1.7rem;
-    color: #fff;
+    color: black;
     text-transform: none;
     background: none;
     border: none;
@@ -1464,18 +1467,10 @@ section{
 }
 
 
-
-
-
-
-
-
-
-
 #feedback-display {
     font-family: Arial, sans-serif; /* Use a readable font */
     font-size: 16px; /* Set a base font size */
-    color: #fff; /* Dark color for better readability */
+    color: black; /* Dark color for better readability */
     text-align: center; /* Center the text */
     margin: 20px auto; /* Center the entire section */
     max-width: 100%; /* Use full width for grid layout */
@@ -1505,7 +1500,7 @@ section{
 #feedback-display .feedback-item .message {
     font-size: 1.2rem; /* Standard font size for the message */
     line-height: 1.5; /* Line height for better readability */
-    color: #ccc; /* Use a lighter shade for the message text */
+    color: black; /* Use a lighter shade for the message text */
 }
 
 

@@ -42,90 +42,83 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             loadingIndicator.style.display = 'flex'; // Show loading indicator
             const ordersSnapshot = await get(ordersRef);
+    
             if (ordersSnapshot.exists()) {
                 const orders = ordersSnapshot.val();
                 dashboardContent.innerHTML = '';
                 ordersDisplay.innerHTML = '';
     
-                // Fetch user profiles once
-                const userProfilesSnapshot = await get(userProfilesRef);
-                const userProfiles = userProfilesSnapshot.val();
+                // Iterate through each user's orders
+                for (const userId in orders) {
+                    const userOrders = orders[userId];
     
-                if (userProfiles) {
-                    // Collect and sort orders
-                    let allOrders = [];
-                    Object.keys(orders).forEach(userId => {
-                        const userOrders = orders[userId];
-                        Object.keys(userOrders).forEach(orderId => {
-                            const order = userOrders[orderId];
-                            allOrders.push({ ...order, userId, orderId });
-                        });
-                    });
+                    // Fetch user details dynamically
+                    const addressRef = ref(db, `users/${userId}/user_address`);
+                    const addressSnapshot = await get(addressRef);
+                    const address = addressSnapshot.exists() ? addressSnapshot.val() : null;
     
-                    // Sort orders by timestamp in descending order
-                    allOrders.sort((a, b) => b.timestamp - a.timestamp);
+                    const usernameRef = ref(db, `users/${userId}/username`);
+                    const usernameSnapshot = await get(usernameRef);
+                    const username = usernameSnapshot.exists() ? usernameSnapshot.val() : 'Unknown';
     
-                    // Display sorted orders
-                    allOrders.forEach(order => {
-                        const userProfile = userProfiles[order.userId]?.user_profile || {};
-                        const username = userProfiles[order.userId]?.username || 'Unknown';
-                        const showPickupButton = order.paymentMethod === 'Cash on Pickup';
+                    const contactName = address?.contactName || 'Anonymous';
     
-                        if (order.orderStatus === 'Pending') {
-                            dashboardContent.innerHTML += `
-                                <div class="order-item" data-user-id="${order.userId}" data-order-id="${order.orderId}">
-                                    <h3>Order ID: ${order.orderId}</h3>
-                                    <p>User Name: ${userProfile.name || 'Anonymous'}</p>
-                                    <p>Username: ${username}</p>
-                                    <p>Total Price: ₱${order.totalPrice.toFixed(2)}</p>
-                                    <p>Shipping Fee: ₱${order.shippingFee.toFixed(2)}</p>
-                                    <p>Payment Method: ${order.paymentMethod}</p>
-                                    <p>Status: ${order.orderStatus}</p>
-                                    <p>Quantity: ${Object.values(order.items).reduce((total, item) => total + item.quantity, 0)}</p>
-                                    <div class="order-items">
-                                        ${Object.values(order.items).map(item => `
-                                            <div class="order-item-detail">
-                                                <img src="${item.productImg}" alt="${item.name}" style="width: 100px; height: auto;" />
-                                                <p>${item.name} - ₱${item.price.toFixed(2)} x ${item.quantity}</p>
-                                            </div>
-                                        `).join('')}
-                                    </div>
-                                    <div class="order-actions">
+                    // Iterate through the user's orders
+                    for (const orderId in userOrders) {
+                        const order = userOrders[orderId];
+    
+                        const fullAddress = address
+                            ? `
+                            Address: ${address.address || 'Unknown'},<br>
+                            City: ${address.city || 'Unknown'},<br>
+                            Region: ${address.region || 'Unknown'},<br>
+                            State: ${address.state || 'Unknown'},<br>
+                            Zip Code: ${address.zip || 'Unknown'},<br>
+                            Contact Number: ${address.phone || 'Unknown'}
+                            `
+                            : 'Address: Unknown';
+    
+                        const orderHTML = `
+                            <div class="order-item" data-user-id="${userId}" data-order-id="${orderId}">
+                                <h3>Order ID: ${orderId}</h3>
+                                <p>Name: ${contactName}</p>
+                                <p>Username: ${username}</p>
+                                <p>Total Price: ₱${order.totalPrice.toFixed(2)}</p>
+                                <p>Shipping Fee: ₱${order.shippingFee.toFixed(2)}</p>
+                                <p>Payment Method: ${order.paymentMethod}</p>
+                                <p>Status: ${order.orderStatus}</p>
+                                <p>Quantity: ${Object.values(order.items).reduce((total, item) => total + item.quantity, 0)}</p>
+                                <p>${fullAddress}</p>
+                                <div class="order-items">
+                                    ${Object.values(order.items).map(item => `
+                                        <div class="order-item-detail">
+                                            <img src="${item.productImg}" alt="${item.name}" style="width: 100px; height: auto;" />
+                                            <p>${item.name} - ₱${item.price.toFixed(2)} x ${item.quantity}</p>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                                <div class="order-actions">
+                                    ${order.orderStatus === 'Pending' 
+                                        ? `
                                         <button class="confirm-btn">Confirm Order</button>
-                                        <button class="reject-btn">Reject Order</button>
-                                    </div>
+                                        <button class="reject-btn">Reject Order</button>`
+                                        : `
+                                        <button class="preparing-btn">Preparing Order</button>
+                                        <button class="ship-btn">Ship Order</button>
+                                        ${order.paymentMethod === 'Cash on Pickup' ? `<button class="pickup-btn">Ready for Pickup</button>` : ''}
+                                        <button class="complete-btn">Complete Order</button>`
+                                    }
                                 </div>
-                            `;
+                            </div>
+                        `;
+    
+                        // Append order based on status
+                        if (order.orderStatus === 'Pending') {
+                            dashboardContent.innerHTML += orderHTML;
                         } else {
-                            ordersDisplay.innerHTML += `
-                                <div class="order-item" data-user-id="${order.userId}" data-order-id="${order.orderId}">
-                                    <h3>Order ID: ${order.orderId}</h3>
-                                    <p>User Name: ${userProfile.name || 'Anonymous'}</p>
-                                    <p>Username: ${username}</p>
-                                    <p>Total Price: ₱${order.totalPrice.toFixed(2)}</p>
-                                    <p>Shipping Fee: ₱${order.shippingFee.toFixed(2)}</p>
-                                    <p>Payment Method: ${order.paymentMethod}</p>
-                                    <p>Status: ${order.orderStatus}</p>
-                                    <p>Quantity: ${Object.values(order.items).reduce((total, item) => total + item.quantity, 0)}</p>
-                                    <div class="order-items">
-                                        ${Object.values(order.items).map(item => `
-                                            <div class="order-item-detail">
-                                                <img src="${item.productImg}" alt="${item.name}" style="width: 100px; height: auto;" />
-                                                <p>${item.name} - ₱${item.price.toFixed(2)} x ${item.quantity}</p>
-                                            </div>
-                                        `).join('')}
-                                    </div>
-                                    <button class="preparing-btn">Preparing Order</button>
-                                    <button class="ship-btn">Ship Order</button>
-                                    ${showPickupButton ? `<button class="pickup-btn">Ready for Pickup</button>` : ''}
-                                    <button class="complete-btn">Complete Order</button>
-                                </div>
-                            `;
+                            ordersDisplay.innerHTML += orderHTML;
                         }
-                    });
-                } else {
-                    dashboardContent.innerHTML = '<p>No pending orders to display.</p>';
-                    ordersDisplay.innerHTML = '<p>No confirmed orders to display.</p>';
+                    }
                 }
             } else {
                 dashboardContent.innerHTML = '<p>No pending orders to display.</p>';
@@ -137,6 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
             loadingIndicator.style.display = 'none'; // Hide loading indicator
         }
     };
+    
 
     // Initial display of orders
     displayOrders();

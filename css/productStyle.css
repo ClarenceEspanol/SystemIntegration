@@ -1,8 +1,8 @@
 :root{
     --main-color:green;
     --black:#13131a;
-    --bg:#010103;
-    --border:.1rem solid rgba(255,255,255,.3);
+    --bg:white;
+    --border:.1rem solid black;
 }
 * {
     margin: 0; padding: 0;
@@ -38,7 +38,7 @@ section{
 .heading{
     margin-top: 6rem;
     text-align: center;
-    color: #fff;
+    color: black;
     text-transform: uppercase;
     padding-bottom: 3.5rem;
     font-size: 4rem;
@@ -52,7 +52,7 @@ section{
     display: inline-block;
     padding: .9rem 3rem;
     font-size: 1.7rem;
-    color: #fff;
+    color: black;
     background: var(--main-color);
     cursor: pointer;
 }
@@ -60,7 +60,7 @@ section{
     letter-spacing: .2rem;
 }
 .header {
-    background: var(--bg);
+    background: black;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -73,7 +73,7 @@ section{
 
 .title {
     font-size: 2rem;
-    color: #fff;
+    color: black;
     margin: 0;
 }
 
@@ -290,7 +290,7 @@ section{
 }
 
 .school .box-container .box .content h3 {
-    color: #fff;
+    color: black;
     font-size: 2.5rem;
 }
 
@@ -304,7 +304,7 @@ section{
 }
 
 .school .box-container .box .content .price {
-    color: #fff;
+    color: black;
     font-size: 2.5rem;
 }
 
@@ -326,7 +326,7 @@ section{
 }
 .stock{
     font-size: 1.5rem;
-    color: #fff;
+    color: black;
     text-align: center;
 }
 .houseware .box-container {
@@ -352,7 +352,7 @@ section{
     line-height: 5rem;
     font-size: 2rem;
     border: var(--border);
-    color: #fff;
+    color: black;
     margin: .3rem;
 }
 
@@ -369,7 +369,7 @@ section{
 }
 
 .houseware .box-container .box .content h3 {
-    color: #fff;
+    color: black;
     font-size: 2.5rem;
 }
 
@@ -383,7 +383,7 @@ section{
 }
 
 .houseware .box-container .box .content .price {
-    color: #fff;
+    color: black;
     font-size: 2.5rem;
 }
 
@@ -446,7 +446,7 @@ section{
 }
 
 .box .content h3 {
-    color: #fff;
+    color: black;
     font-size: 1rem;
     white-space: nowrap; /* Prevent text from breaking into multiple lines */
     overflow: hidden; /* Hide overflow text */
@@ -454,7 +454,7 @@ section{
 }
 
 .box .content .price {
-    color: #fff;
+    color: black;
     font-size: 2rem;
 }
 
@@ -466,7 +466,7 @@ section{
 
 .box .content .stock {
     font-size: 1.5rem;
-    color: #fff;
+    color: black;
 }
 
 .show {
