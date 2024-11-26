@@ -250,8 +250,9 @@ function displayProducts() {
             const limitedProducts = products.slice(0, 6);
 
             // Display the limited products
-            limitedProducts.forEach(product => {
-                const box = createProductBox(product, 'school-supplies');
+            limitedProducts.forEach((product, index) => {
+                const isNewProduct = index < 3; // First 3 products are new
+                const box = createProductBox(product, 'school-supplies', isNewProduct);
                 boxContainer.appendChild(box);
             });
 
@@ -289,8 +290,9 @@ function displayHousewareProducts() {
             const limitedProducts = products.slice(0, 6);
 
             // Display the limited products
-            limitedProducts.forEach(product => {
-                const box = createProductBox(product, 'houseware');
+            limitedProducts.forEach((product, index) => {
+                const isNewProduct = index < 3; // First 3 products are new
+                const box = createProductBox(product, 'houseware', isNewProduct);
                 boxContainer.appendChild(box);
             });
 
@@ -307,7 +309,7 @@ function displayHousewareProducts() {
 }
 
 // Function to create a product box element
-function createProductBox(product, type) {
+function createProductBox(product, type, isNewProduct = false) {
     const box = document.createElement('div');
     box.className = 'box';
     box.setAttribute('data-name', product.name);
@@ -330,23 +332,125 @@ function createProductBox(product, type) {
                 <span class="stock-quantity">${product.quantity}</span>
             </div>
             ${isOutOfStock 
-                ? '<a href="#" class="btn out-of-stock-btn" disabled>Out of Stock</a>' 
-                : `<a href="#" class="btn add-to-cart-btn" data-id="${product.id}" data-type="${type}">Add to Cart</a>`
+                ? '<a href="#" class=" out-of-stock-btn" disabled>Out of Stock</a>' 
+                : `<a href="#" class=" add-to-cart-btn" data-id="${product.id}" data-type="${type}">Add to Cart</a>`
             }
+            <!-- View Reviews Button -->
+            <a href="#" class=" view-reviews-btn" data-id="${product.id}" data-type="${type}">View Reviews</a>
         </div>`;
+
+    // Add a "New Product" tag for the first 3 products
+    if (isNewProduct) {
+        const newTag = document.createElement('span');
+        newTag.className = 'new-product-tag';
+        newTag.textContent = 'New Product';
+        box.querySelector('.content').prepend(newTag); // Prepend to the content section
+    }
 
     // Add event listener to handle add-to-cart action
     if (!isOutOfStock) {
         box.querySelector('.add-to-cart-btn').addEventListener('click', (event) => {
             event.preventDefault(); // Prevent default anchor behavior
-            
             // Call the addToCart function
             addToCart(event);
         });
     }
 
+    // Function to handle the "View Reviews" button click
+    box.querySelector('.view-reviews-btn').addEventListener('click', (event) => {
+        event.preventDefault();
+        const productId = event.target.getAttribute('data-id');
+        const productType = event.target.getAttribute('data-type'); // Ensure this attribute exists on the button
+        openReviewModal(productId, productType); // Call the function to open the modal and show reviews
+    });
+
     return box;
 }
+
+
+function openReviewModal(productId, productType) {
+    const modal = document.getElementById('product-review-modal');
+    const reviewsContainer = document.getElementById('modal-reviews');
+
+    console.log("Opening review modal for", productId, productType); // Debugging log
+
+    // Fetch reviews from Firebase based on product type and ID
+    fetchReviews(productId, productType).then((reviews) => {
+        reviewsContainer.innerHTML = ''; // Clear previous reviews
+
+        // Populate reviews section
+        if (reviews && reviews.length > 0) {
+            reviews.forEach((review) => {
+                const reviewDiv = document.createElement('div');
+                reviewDiv.classList.add('review-item');
+                reviewDiv.innerHTML = `
+                    <p>${review.reviewText}</p>
+                `;
+                reviewsContainer.appendChild(reviewDiv);
+            });
+        } else {
+            reviewsContainer.innerHTML = '<p>No reviews available.</p>';
+        }
+    }).catch((error) => {
+        reviewsContainer.innerHTML = '<p>Error loading reviews.</p>';
+        console.error("Error displaying reviews:", error);
+    });
+
+    // Show modal
+    modal.style.display = 'block';
+
+    // Close modal when clicking on close button
+    document.getElementById('close-product-review-modal').onclick = function () {
+        modal.style.display = 'none';
+    };
+}
+
+// Function to fetch reviews for a product (from Firebase)
+async function fetchReviews(productId, productType) {
+    const db = getDatabase();
+    const reviewsRef = ref(db, `${productType}/${productId}/reviews`);
+
+    try {
+        // Get the snapshot of reviews data from Firebase
+        const snapshot = await get(reviewsRef);
+        console.log("Fetched snapshot:", snapshot.val()); // Debugging log
+
+        // Check if data exists at this reference
+        if (!snapshot.exists()) {
+            console.log("No reviews found.");
+            return [];
+        }
+
+        // Initialize an array to hold the reviews
+        const reviewsArray = [];
+
+        // Since each product has a 'reviewText' directly under 'reviews'
+        const reviewText = snapshot.val()?.reviewText;
+
+        // If reviewText exists, push it into the reviewsArray
+        if (reviewText) {
+            reviewsArray.push({
+                reviewText: reviewText || "No review text provided", // Fallback if no review text exists
+            });
+        } else {
+            console.log("No reviewText found for this product.");
+        }
+
+        // Return the array of reviews
+        return reviewsArray;
+
+    } catch (error) {
+        console.error('Error fetching reviews:', error);
+        throw error;
+    }
+}
+
+// Close the modal if the user clicks outside of the modal content
+window.addEventListener('click', (event) => {
+    if (event.target === document.getElementById('product-review-modal')) {
+        document.getElementById('product-review-modal').style.display = 'none';
+    }
+});
 
 // Function to handle adding items to the cart
 function addToCart(event) {
@@ -1122,11 +1226,12 @@ document.addEventListener('DOMContentLoaded', () => {
                             <p><strong>Payment Method:</strong> ${order.paymentMethod || 'N/A'}</p>
                             <p><strong>Order Date:</strong> ${order.timestamp ? new Date(order.timestamp).toLocaleDateString() : 'N/A'}</p>
                             <button class="reorder-btn" data-order-id="${orderKey}">Reorder</button>
+                            <button class="write-review-btn" data-order-id="${orderKey}">Write a Review</button>
                         `;
                         historyList.appendChild(orderItem);
                     });
     
-                    // Add event listener for reorder buttons
+                    // Add event listeners for reorder buttons
                     document.querySelectorAll('.reorder-btn').forEach(btn => {
                         btn.addEventListener('click', async (event) => {
                             const orderKey = event.target.getAttribute('data-order-id');
@@ -1160,6 +1265,14 @@ document.addEventListener('DOMContentLoaded', () => {
                         });
                     });
     
+                    // Add event listeners for "Write a Review" buttons
+                    document.querySelectorAll('.write-review-btn').forEach(btn => {
+                        btn.addEventListener('click', (event) => {
+                            const orderKey = event.target.getAttribute('data-order-id');
+                            openReviewModal(orderKey);
+                        });
+                    });
+    
                 } else {
                     historyList.innerHTML = '<p>No order history found.</p>';
                 }
@@ -1171,6 +1284,83 @@ document.addEventListener('DOMContentLoaded', () => {
             historyList.innerHTML = '<p>You need to log in to view order history.</p>';
         }
     }
+    
+   // Function to open the review modal and set order details
+function openReviewModal(orderId) {
+    const reviewModal = document.getElementById('review-modal');
+    reviewModal.style.display = 'block';
+    document.getElementById('review-order-id').textContent = `Order ID: ${orderId}`;
+    document.getElementById('review-order-id').dataset.orderId = orderId; // Store orderId for later reference
+}
+
+// Close the review modal
+document.getElementById('close-review-modal').addEventListener('click', () => {
+    document.getElementById('review-modal').style.display = 'none';
+    document.getElementById('review-text').value = ''; // Clear the review text field on close
+});
+
+// Function to submit the review
+async function submitReview() {
+    const user = auth.currentUser;
+
+    // Retrieve the review text and order ID
+    const reviewText = document.getElementById('review-text').value;
+    const orderId = document.getElementById('review-order-id').dataset.orderId;
+
+    if (!reviewText.trim()) {
+        alert("Please enter a review before submitting.");
+        return;
+    }
+
+    try {
+        // Retrieve order details to find the product type and ID
+        const orderRef = ref(db, `order-history/${user ? user.uid : 'guest'}/${orderId}/items`);
+        const orderSnapshot = await get(orderRef);
+
+        if (orderSnapshot.exists()) {
+            const items = orderSnapshot.val();
+
+            // Loop through each item in the order to create a review for each product
+            for (let itemKey in items) {
+                const item = items[itemKey];
+                const productType = item.type; // Should be either 'school-supplies' or 'houseware'
+                const productId = item.id;     // Product ID within the product category
+
+                // Path to the specific product's reviews in Firebase database (without userId in the path)
+                const productReviewRef = ref(db, `${productType}/${productId}/reviews`);
+
+                // Create review data (including the userId in the review data, but not in the path)
+                const reviewData = {
+                    userId: user ? user.uid : 'guest', // Store userId, or 'guest' if not logged in
+                    reviewText: reviewText,
+                    timestamp: new Date().toISOString(),
+                };
+
+                // Set the review data directly at the reviews node (no push or auto-generated ID)
+                await set(productReviewRef, reviewData);
+            }
+
+            alert("Review submitted successfully!");
+            closeReviewModal();
+        } else {
+            console.error('Order data not found for the specified order.');
+            alert("Unable to find order details to submit the review.");
+        }
+
+    } catch (error) {
+        console.error("Error submitting review:", error);
+        alert("There was an error submitting your review. Please try again.");
+    }
+}
+
+// Function to close the review modal
+function closeReviewModal() {
+    document.getElementById('review-modal').style.display = 'none';
+    document.getElementById('review-text').value = ''; // Clear the text area
+}
+
+// Event listener for the submit button in the review modal
+document.getElementById('submit-review').addEventListener('click', submitReview);
 
     // Main function to filter order history
     async function filterOrderHistory() {

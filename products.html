@@ -17,29 +17,38 @@
     </section>
 
     <section class="header">
-            <div class="navbar">
-                <a href="index.html">Home</a>
-                <a href="#school">School Supplies</a>
-                <a href="#houseware">Houseware</a>
-                <a href="#" id="track-orders-link">Track Orders</a>
-            </div>
-            <div class="icons">
-                <div class="fas fa-shopping-cart" id="cart-btn">
-                    <span id="cart-count" class="cart-count">0</span>
-                </div>
-                <div class="fas fa-bars" id="menu-btn"></div>
-            </div>
-            
-           <!-- Cart Items Container -->
-            <div class="cart-items-container">
-                <!-- Total Price Display -->
-                <div class="cart-total">
-                    <div class="price">₱0.00</div>
-                <!-- Cart items will be dynamically added here -->
-            <div id="cart-items"></div>
-            <a href="" class="btn" id="checkoutbtn">Checkout Now</a>
+        <div class="navbar">
+            <a href="index.html">Home</a>
+            <a href="#school">School Supplies</a>
+            <a href="#houseware">Houseware</a>
+            <a href="#" id="track-orders-link">Track Orders</a>
         </div>
-        </section>
+        <div class="icons">
+            <!-- Search Icon -->
+            <div class="fas fa-search" id="search-btn"></div>
+    
+            <div class="fas fa-shopping-cart" id="cart-btn">
+                <span id="cart-count" class="cart-count">0</span>
+            </div>
+            <div class="fas fa-bars" id="menu-btn"></div>
+        </div>
+        
+        <!-- Search Textbox (Initially Hidden) -->
+        <div id="search-box-container" style="display: none;">
+            <input type="text" id="search-box" placeholder="Search...">
+        </div>
+    
+        <!-- Cart Items Container -->
+        <div class="cart-items-container">
+            <!-- Total Price Display -->
+            <div class="cart-total">
+                <div class="price">₱0.00</div>
+                <!-- Cart items will be dynamically added here -->
+                <div id="cart-items"></div>
+                <a href="" class="btn" id="checkoutbtn">Checkout Now</a>
+            </div>
+        </div>
+    </section>
 
     <!-- school supplies -->
     <section class="school" id="school">
@@ -133,8 +142,25 @@
     </div>
 </div>
 
+<!-- write Reviews Modal -->
+<div id="review-modal" class="modal">
+    <div class="modal-content">
+        <span id="close-review-modal" class="close">&times;</span>
+        <h2>Write a Review</h2>
+        <p id="review-order-id"></p>
+        <textarea id="review-text" placeholder="Write your review here..."></textarea>
+        <button id="submit-review">Submit Review</button>
+    </div>
+</div>
 
-
+<!-- Product Reviews Modal -->
+<div id="product-review-modal" class="product-review-modal">
+    <div class="product-review-modal-content">
+        <span id="close-product-review-modal" class="close">&times;</span>
+        <h3>Reviews</h3>
+        <div id="modal-reviews"></div>
+    </div>
+</div>
     <script type="module" src="js/product.js"></script>
 </body>
 </html>

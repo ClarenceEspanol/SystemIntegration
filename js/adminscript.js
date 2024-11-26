@@ -101,13 +101,12 @@ document.addEventListener('DOMContentLoaded', () => {
                                     ${order.orderStatus === 'Pending' 
                                         ? `
                                         <button class="confirm-btn">Confirm Order</button>
-                                        <button class="reject-btn">Reject Order</button>`
+                                        <button class="reject-btn">Reject Order</button>` 
                                         : `
                                         <button class="preparing-btn">Preparing Order</button>
                                         <button class="ship-btn">Ship Order</button>
                                         ${order.paymentMethod === 'Cash on Pickup' ? `<button class="pickup-btn">Ready for Pickup</button>` : ''}
-                                        <button class="complete-btn">Complete Order</button>`
-                                    }
+                                        <button class="complete-btn">Complete Order</button>`}
                                 </div>
                             </div>
                         `;
@@ -130,119 +129,122 @@ document.addEventListener('DOMContentLoaded', () => {
             loadingIndicator.style.display = 'none'; // Hide loading indicator
         }
     };
-    
 
     // Initial display of orders
     displayOrders();
 
-   // Handle button clicks
-const handleButtonClick = async (event) => {
-    const userId = event.target.closest('.order-item')?.dataset.userId;
-    const orderId = event.target.closest('.order-item')?.dataset.orderId;
+    // Handle button clicks
+    const handleButtonClick = async (event) => {
+        const userId = event.target.closest('.order-item')?.dataset.userId;
+        const orderId = event.target.closest('.order-item')?.dataset.orderId;
 
-    if (!userId || !orderId) {
-        console.log('Missing data attributes');
-        return;
-    }
-
-    try {
-        loadingIndicator.style.display = 'flex'; // Show loading indicator
-
-        if (event.target.classList.contains('confirm-btn')) {
-            console.log('Confirm button clicked');
-            const orderRef = ref(db, `orders/${userId}/${orderId}`);
-            const orderSnapshot = await get(orderRef);
-
-            if (orderSnapshot.exists()) {
-                const order = orderSnapshot.val();
-                await update(orderRef, { orderStatus: 'CONFIRMED' });
-                await Promise.all(Object.keys(order.items).map(async (itemId) => {
-                    const item = order.items[itemId];
-                    const productType = item.productType;
-                    const itemIdFromOrder = item.id;
-
-                    const productPath = `${productType}/${itemIdFromOrder}`;
-                    const productRef = ref(db, productPath);
-                    const productSnapshot = await get(productRef);
-
-                    if (productSnapshot.exists()) {
-                        const product = productSnapshot.val();
-                        const newQuantity = product.quantity - item.quantity;
-                        if (newQuantity < 0) {
-                            console.error('Insufficient stock for product:', productPath);
-                            return;
-                        }
-                        await update(productRef, { quantity: newQuantity });
-                    }
-                }));
-                alert('Order confirmed successfully!');
-            }
-        } else if (event.target.classList.contains('reject-btn')) {
-            console.log('Reject button clicked');
-            const orderRef = ref(db, `orders/${userId}/${orderId}`);
-            const orderSnapshot = await get(orderRef);
-
-            if (orderSnapshot.exists()) {
-                const order = orderSnapshot.val();
-                
-                // Add order to 'order-history' with status 'REJECTED'
-                const orderHistoryRef = ref(db, `order-history/${userId}/${orderId}`);
-                await set(orderHistoryRef, { ...order, orderStatus: 'REJECTED' });
-
-                // Remove order from 'orders' node
-                await remove(orderRef);
-                
-                alert('Order rejected successfully and moved to order history!');
-            }
-        } else if (event.target.classList.contains('preparing-btn')) {
-            console.log('Preparing button clicked');
-            const orderRef = ref(db, `orders/${userId}/${orderId}`);
-            await update(orderRef, { orderStatus: 'PREPARING' });
-            alert('Order status updated to Preparing!');
-        } else if (event.target.classList.contains('ship-btn')) {
-            console.log('Ship button clicked');
-            const orderRef = ref(db, `orders/${userId}/${orderId}`);
-            const orderSnapshot = await get(orderRef);
-
-            if (orderSnapshot.exists()) {
-                const order = orderSnapshot.val();
-                const newStatus = order.paymentMethod === 'Cash on Pick up' 
-                    ? 'READY FOR PICKUP' 
-                    : 'TO SHIP';
-                await update(orderRef, { orderStatus: newStatus });
-                alert(`Order status updated to ${newStatus}!`);
-            }
-        } else if (event.target.classList.contains('pickup-btn')) {
-            console.log('Pickup button clicked');
-            const orderRef = ref(db, `orders/${userId}/${orderId}`);
-            await update(orderRef, { orderStatus: 'READY FOR PICKUP' });
-            alert('Order status updated to Ready for Pickup!');
-        } else if (event.target.classList.contains('complete-btn')) {
-            console.log('Complete button clicked');
-            const orderRef = ref(db, `orders/${userId}/${orderId}`);
-            const orderSnapshot = await get(orderRef);
-
-            if (orderSnapshot.exists()) {
-                const order = orderSnapshot.val();
-                await remove(orderRef); // Remove order from the 'orders' section
-
-                // Add order to 'order-history'
-                const orderHistoryRef = ref(db, `order-history/${userId}/${orderId}`);
-                await set(orderHistoryRef, { ...order, orderStatus: 'COMPLETED' });
-
-                alert('Order marked as Completed and moved to order history!');
-            }
+        if (!userId || !orderId) {
+            console.log('Missing data attributes');
+            return;
         }
-        displayOrders();
-    } catch (error) {
-        console.error('Error updating order:', error);
-    } finally {
-        loadingIndicator.style.display = 'none'; // Hide loading indicator
-    }
-};
 
-document.addEventListener('click', handleButtonClick);
+        try {
+            loadingIndicator.style.display = 'flex'; // Show loading indicator
+
+            if (event.target.classList.contains('confirm-btn')) {
+                console.log('Confirm button clicked');
+                const orderRef = ref(db, `orders/${userId}/${orderId}`);
+                const orderSnapshot = await get(orderRef);
+
+                if (orderSnapshot.exists()) {
+                    const order = orderSnapshot.val();
+                    await update(orderRef, { orderStatus: 'CONFIRMED' });
+
+                    // Update sold quantity based on the product type and ID
+                    await Promise.all(Object.keys(order.items).map(async (itemId) => {
+                        const item = order.items[itemId];
+                        const productType = item.productType;  // 'houseware' or 'school-supplies'
+                        const itemIdFromOrder = item.id;  // Product ID in the order
+
+                        const productPath = `${productType}/${itemIdFromOrder}`;
+                        const productRef = ref(db, productPath);
+                        const productSnapshot = await get(productRef);
+
+                        if (productSnapshot.exists()) {
+                            const product = productSnapshot.val();
+                            const newSoldQuantity = (product.sold || 0) + item.quantity;
+
+                            // Update the sold count
+                            await update(productRef, { sold: newSoldQuantity });
+                        } else {
+                            console.error('Product not found:', productPath);
+                        }
+                    }));
+
+                    alert('Order confirmed successfully!');
+                }
+            } else if (event.target.classList.contains('reject-btn')) {
+                console.log('Reject button clicked');
+                const orderRef = ref(db, `orders/${userId}/${orderId}`);
+                const orderSnapshot = await get(orderRef);
+
+                if (orderSnapshot.exists()) {
+                    const order = orderSnapshot.val();
+                    
+                    // Add order to 'order-history' with status 'REJECTED'
+                    const orderHistoryRef = ref(db, `order-history/${userId}/${orderId}`);
+                    await set(orderHistoryRef, { ...order, orderStatus: 'REJECTED' });
+
+                    // Remove order from 'orders' node
+                    await remove(orderRef);
+                    
+                    alert('Order rejected successfully and moved to order history!');
+                }
+            } else if (event.target.classList.contains('preparing-btn')) {
+                console.log('Preparing button clicked');
+                const orderRef = ref(db, `orders/${userId}/${orderId}`);
+                await update(orderRef, { orderStatus: 'PREPARING' });
+                alert('Order status updated to Preparing!');
+            } else if (event.target.classList.contains('ship-btn')) {
+                console.log('Ship button clicked');
+                const orderRef = ref(db, `orders/${userId}/${orderId}`);
+                const orderSnapshot = await get(orderRef);
+
+                if (orderSnapshot.exists()) {
+                    const order = orderSnapshot.val();
+                    const newStatus = order.paymentMethod === 'Cash on Pickup' 
+                        ? 'READY FOR PICKUP' 
+                        : 'TO SHIP';
+                    await update(orderRef, { orderStatus: newStatus });
+                    alert(`Order status updated to ${newStatus}!`);
+                }
+            } else if (event.target.classList.contains('pickup-btn')) {
+                console.log('Pickup button clicked');
+                const orderRef = ref(db, `orders/${userId}/${orderId}`);
+                await update(orderRef, { orderStatus: 'READY FOR PICKUP' });
+                alert('Order status updated to Ready for Pickup!');
+            } else if (event.target.classList.contains('complete-btn')) {
+                console.log('Complete button clicked');
+                const orderRef = ref(db, `orders/${userId}/${orderId}`);
+                const orderSnapshot = await get(orderRef);
+
+                if (orderSnapshot.exists()) {
+                    const order = orderSnapshot.val();
+                    await remove(orderRef); // Remove order from the 'orders' section
+
+                    // Add order to 'order-history'
+                    const orderHistoryRef = ref(db, `order-history/${userId}/${orderId}`);
+                    await set(orderHistoryRef, { ...order, orderStatus: 'COMPLETED' });
+
+                    alert('Order marked as Completed and moved to order history!');
+                }
+            }
+            displayOrders();
+        } catch (error) {
+            console.error('Error updating order:', error);
+        } finally {
+            loadingIndicator.style.display = 'none'; // Hide loading indicator
+        }
+    };
+
+    document.addEventListener('click', handleButtonClick);
 });
+
 
 
 //add products
@@ -293,7 +295,7 @@ document.getElementById('add-product-form')?.addEventListener('submit', async (e
             productImg: productImgUrl // Store the image URL here
         };
         
-        // Save the new product to the database
+        // Prepend the new product to the Firebase list (push at the top)
         await set(ref(db, `/${productType}/${productId}`), newProduct);
 
         // Update the product ID counter
@@ -429,7 +431,9 @@ function loadProducts() {
             schoolSuppliesList.innerHTML = '';
             if (snapshot.exists()) {
                 const products = snapshot.val();
-                Object.values(products).forEach(product => {
+                const sortedProducts = Object.values(products).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); // Sort by createdAt descending
+                
+                sortedProducts.forEach((product, index) => {
                     const productItem = document.createElement('li');
                     
                     // Create product name and ID text
@@ -456,6 +460,14 @@ function loadProducts() {
                         stockIndicator.style.color = 'green'; // Green for sufficient stock
                     }
                     productItem.appendChild(stockIndicator);
+
+                    // Add "Newly Added" tag for the first 5 items
+                    if (index < 5) {
+                        const newTag = document.createElement('span');
+                        newTag.textContent = ' - Newly Added';
+                        newTag.style.color = 'blue'; // Style the tag color
+                        productItem.appendChild(newTag);
+                    }
 
                     productItem.dataset.productId = product.id;
                     productItem.dataset.productType = 'school-supplies';
@@ -479,7 +491,9 @@ function loadProducts() {
             housewareList.innerHTML = '';
             if (snapshot.exists()) {
                 const products = snapshot.val();
-                Object.values(products).forEach(product => {
+                const sortedProducts = Object.values(products).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); // Sort by createdAt descending
+                
+                sortedProducts.forEach((product, index) => {
                     const productItem = document.createElement('li');
                     
                     // Create product name and ID text
@@ -507,6 +521,14 @@ function loadProducts() {
                     }
                     productItem.appendChild(stockIndicator);
 
+                    // Add "Newly Added" tag for the first 5 items
+                    if (index < 5) {
+                        const newTag = document.createElement('span');
+                        newTag.textContent = ' - Newly Added';
+                        newTag.style.color = 'blue'; // Style the tag color
+                        productItem.appendChild(newTag);
+                    }
+
                     productItem.dataset.productId = product.id;
                     productItem.dataset.productType = 'houseware';
                     productItem.classList.add('product-item');
@@ -523,6 +545,7 @@ function loadProducts() {
         }
     });
 }
+
 
 // Function to handle form population on product item click
 function handleProductItemClick(event) {
